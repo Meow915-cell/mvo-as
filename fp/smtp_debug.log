@@ -1,0 +1,318 @@
+SERVER -> CLIENT: 220 smtp.gmail.com ESMTP d2e1a72fcca58-74059020dfdsm4870689b3a.119 - gsmtp
+
+CLIENT -> SERVER: EHLO localhost
+
+SERVER -> CLIENT: 250-smtp.gmail.com at your service, [136.158.126.15]
+250-SIZE 35882577
+250-8BITMIME
+250-STARTTLS
+250-ENHANCEDSTATUSCODES
+250-PIPELINING
+250-CHUNKING
+250 SMTPUTF8
+
+CLIENT -> SERVER: STARTTLS
+
+SERVER -> CLIENT: 220 2.0.0 Ready to start TLS
+
+CLIENT -> SERVER: EHLO localhost
+
+SERVER -> CLIENT: 250-smtp.gmail.com at your service, [136.158.126.15]
+250-SIZE 35882577
+250-8BITMIME
+250-AUTH LOGIN PLAIN XOAUTH2 PLAIN-CLIENTTOKEN OAUTHBEARER XOAUTH
+250-ENHANCEDSTATUSCODES
+250-PIPELINING
+250-CHUNKING
+250 SMTPUTF8
+
+CLIENT -> SERVER: AUTH LOGIN
+
+SERVER -> CLIENT: 334 VXNlcm5hbWU6
+
+CLIENT -> SERVER: [credentials hidden]
+SERVER -> CLIENT: 334 UGFzc3dvcmQ6
+
+CLIENT -> SERVER: [credentials hidden]
+SERVER -> CLIENT: 235 2.7.0 Accepted
+
+CLIENT -> SERVER: MAIL FROM:<venturinaden930@gmail.com>
+
+SERVER -> CLIENT: 250 2.1.0 OK d2e1a72fcca58-74059020dfdsm4870689b3a.119 - gsmtp
+
+CLIENT -> SERVER: RCPT TO:<denielleventurina@gmail.com>
+
+SERVER -> CLIENT: 250 2.1.5 OK d2e1a72fcca58-74059020dfdsm4870689b3a.119 - gsmtp
+
+CLIENT -> SERVER: DATA
+
+SERVER -> CLIENT: 354 Go ahead d2e1a72fcca58-74059020dfdsm4870689b3a.119 - gsmtp
+
+CLIENT -> SERVER: Date: Sun, 4 May 2025 15:50:40 +0200
+
+CLIENT -> SERVER: To: denielleventurina@gmail.com
+
+CLIENT -> SERVER: From: Pet Veterinary Services <venturinaden930@gmail.com>
+
+CLIENT -> SERVER: Subject: Password Reset Code
+
+CLIENT -> SERVER: Message-ID: <VGsDCsav3GhHooTUgHItRmC5i921tl0m1ZP2UAFtVE@localhost>
+
+CLIENT -> SERVER: X-Mailer: PHPMailer 6.10.0 (https://github.com/PHPMailer/PHPMailer)
+
+CLIENT -> SERVER: MIME-Version: 1.0
+
+CLIENT -> SERVER: Content-Type: multipart/alternative;
+
+CLIENT -> SERVER:  boundary="b1=_VGsDCsav3GhHooTUgHItRmC5i921tl0m1ZP2UAFtVE"
+
+CLIENT -> SERVER: Content-Transfer-Encoding: 8bit
+
+CLIENT -> SERVER: 
+
+CLIENT -> SERVER: --b1=_VGsDCsav3GhHooTUgHItRmC5i921tl0m1ZP2UAFtVE
+
+CLIENT -> SERVER: Content-Type: text/plain; charset=us-ascii
+
+CLIENT -> SERVER: 
+
+CLIENT -> SERVER: Your password reset code is: 861930
+
+CLIENT -> SERVER: 
+
+CLIENT -> SERVER: --b1=_VGsDCsav3GhHooTUgHItRmC5i921tl0m1ZP2UAFtVE
+
+CLIENT -> SERVER: Content-Type: text/html; charset=us-ascii
+
+CLIENT -> SERVER: 
+
+CLIENT -> SERVER: <p>Your password reset code is: <strong>861930</strong></p>
+
+CLIENT -> SERVER: 
+
+CLIENT -> SERVER: 
+
+CLIENT -> SERVER: --b1=_VGsDCsav3GhHooTUgHItRmC5i921tl0m1ZP2UAFtVE--
+
+CLIENT -> SERVER: 
+
+CLIENT -> SERVER: .
+
+SERVER -> CLIENT: 250 2.0.0 OK  1746366642 d2e1a72fcca58-74059020dfdsm4870689b3a.119 - gsmtp
+
+CLIENT -> SERVER: QUIT
+
+SERVER -> CLIENT: 221 2.0.0 closing connection d2e1a72fcca58-74059020dfdsm4870689b3a.119 - gsmtp
+
+SERVER -> CLIENT: 220 smtp.gmail.com ESMTP d2e1a72fcca58-74058d7ad7asm5077423b3a.11 - gsmtp
+
+CLIENT -> SERVER: EHLO localhost
+
+SERVER -> CLIENT: 250-smtp.gmail.com at your service, [136.158.126.15]
+250-SIZE 35882577
+250-8BITMIME
+250-STARTTLS
+250-ENHANCEDSTATUSCODES
+250-PIPELINING
+250-CHUNKING
+250 SMTPUTF8
+
+CLIENT -> SERVER: STARTTLS
+
+SERVER -> CLIENT: 220 2.0.0 Ready to start TLS
+
+CLIENT -> SERVER: EHLO localhost
+
+SERVER -> CLIENT: 250-smtp.gmail.com at your service, [136.158.126.15]
+250-SIZE 35882577
+250-8BITMIME
+250-AUTH LOGIN PLAIN XOAUTH2 PLAIN-CLIENTTOKEN OAUTHBEARER XOAUTH
+250-ENHANCEDSTATUSCODES
+250-PIPELINING
+250-CHUNKING
+250 SMTPUTF8
+
+CLIENT -> SERVER: AUTH LOGIN
+
+SERVER -> CLIENT: 334 VXNlcm5hbWU6
+
+CLIENT -> SERVER: [credentials hidden]
+SERVER -> CLIENT: 334 UGFzc3dvcmQ6
+
+CLIENT -> SERVER: [credentials hidden]
+SERVER -> CLIENT: 235 2.7.0 Accepted
+
+CLIENT -> SERVER: MAIL FROM:<venturinaden930@gmail.com>
+
+SERVER -> CLIENT: 250 2.1.0 OK d2e1a72fcca58-74058d7ad7asm5077423b3a.11 - gsmtp
+
+CLIENT -> SERVER: RCPT TO:<patrickventurina08@gmail.com>
+
+SERVER -> CLIENT: 250 2.1.5 OK d2e1a72fcca58-74058d7ad7asm5077423b3a.11 - gsmtp
+
+CLIENT -> SERVER: DATA
+
+SERVER -> CLIENT: 354 Go ahead d2e1a72fcca58-74058d7ad7asm5077423b3a.11 - gsmtp
+
+CLIENT -> SERVER: Date: Sun, 4 May 2025 15:54:33 +0200
+
+CLIENT -> SERVER: To: patrickventurina08@gmail.com
+
+CLIENT -> SERVER: From: Pet Veterinary Services <venturinaden930@gmail.com>
+
+CLIENT -> SERVER: Subject: Password Reset Code
+
+CLIENT -> SERVER: Message-ID: <tEEClMzvocZZEg6lxjfZffRROkz6ViC1kZzYDRxMdk@localhost>
+
+CLIENT -> SERVER: X-Mailer: PHPMailer 6.10.0 (https://github.com/PHPMailer/PHPMailer)
+
+CLIENT -> SERVER: MIME-Version: 1.0
+
+CLIENT -> SERVER: Content-Type: multipart/alternative;
+
+CLIENT -> SERVER:  boundary="b1=_tEEClMzvocZZEg6lxjfZffRROkz6ViC1kZzYDRxMdk"
+
+CLIENT -> SERVER: Content-Transfer-Encoding: 8bit
+
+CLIENT -> SERVER: 
+
+CLIENT -> SERVER: --b1=_tEEClMzvocZZEg6lxjfZffRROkz6ViC1kZzYDRxMdk
+
+CLIENT -> SERVER: Content-Type: text/plain; charset=us-ascii
+
+CLIENT -> SERVER: 
+
+CLIENT -> SERVER: Your password reset code is: 145587
+
+CLIENT -> SERVER: 
+
+CLIENT -> SERVER: --b1=_tEEClMzvocZZEg6lxjfZffRROkz6ViC1kZzYDRxMdk
+
+CLIENT -> SERVER: Content-Type: text/html; charset=us-ascii
+
+CLIENT -> SERVER: 
+
+CLIENT -> SERVER: <p>Your password reset code is: <strong>145587</strong></p>
+
+CLIENT -> SERVER: 
+
+CLIENT -> SERVER: 
+
+CLIENT -> SERVER: --b1=_tEEClMzvocZZEg6lxjfZffRROkz6ViC1kZzYDRxMdk--
+
+CLIENT -> SERVER: 
+
+CLIENT -> SERVER: .
+
+SERVER -> CLIENT: 250 2.0.0 OK  1746366875 d2e1a72fcca58-74058d7ad7asm5077423b3a.11 - gsmtp
+
+CLIENT -> SERVER: QUIT
+
+SERVER -> CLIENT: 221 2.0.0 closing connection d2e1a72fcca58-74058d7ad7asm5077423b3a.11 - gsmtp
+
+SERVER -> CLIENT: 220 smtp.gmail.com ESMTP d2e1a72fcca58-74058dc4641sm5157085b3a.66 - gsmtp
+
+CLIENT -> SERVER: EHLO localhost
+
+SERVER -> CLIENT: 250-smtp.gmail.com at your service, [136.158.126.15]
+250-SIZE 35882577
+250-8BITMIME
+250-STARTTLS
+250-ENHANCEDSTATUSCODES
+250-PIPELINING
+250-CHUNKING
+250 SMTPUTF8
+
+CLIENT -> SERVER: STARTTLS
+
+SERVER -> CLIENT: 220 2.0.0 Ready to start TLS
+
+CLIENT -> SERVER: EHLO localhost
+
+SERVER -> CLIENT: 250-smtp.gmail.com at your service, [136.158.126.15]
+250-SIZE 35882577
+250-8BITMIME
+250-AUTH LOGIN PLAIN XOAUTH2 PLAIN-CLIENTTOKEN OAUTHBEARER XOAUTH
+250-ENHANCEDSTATUSCODES
+250-PIPELINING
+250-CHUNKING
+250 SMTPUTF8
+
+CLIENT -> SERVER: AUTH LOGIN
+
+SERVER -> CLIENT: 334 VXNlcm5hbWU6
+
+CLIENT -> SERVER: [credentials hidden]
+SERVER -> CLIENT: 334 UGFzc3dvcmQ6
+
+CLIENT -> SERVER: [credentials hidden]
+SERVER -> CLIENT: 235 2.7.0 Accepted
+
+CLIENT -> SERVER: MAIL FROM:<venturinaden930@gmail.com>
+
+SERVER -> CLIENT: 250 2.1.0 OK d2e1a72fcca58-74058dc4641sm5157085b3a.66 - gsmtp
+
+CLIENT -> SERVER: RCPT TO:<denielleventurina@gmail.com>
+
+SERVER -> CLIENT: 250 2.1.5 OK d2e1a72fcca58-74058dc4641sm5157085b3a.66 - gsmtp
+
+CLIENT -> SERVER: DATA
+
+SERVER -> CLIENT: 354 Go ahead d2e1a72fcca58-74058dc4641sm5157085b3a.66 - gsmtp
+
+CLIENT -> SERVER: Date: Sun, 4 May 2025 17:36:19 +0200
+
+CLIENT -> SERVER: To: denielleventurina@gmail.com
+
+CLIENT -> SERVER: From: "(MVO)Municipal Vet Office" <venturinaden930@gmail.com>
+
+CLIENT -> SERVER: Subject: Password Reset Code
+
+CLIENT -> SERVER: Message-ID: <BIMySytiuBd1axi0T1WAdEZSXbwwMUcSM4UTCRRaJQ@localhost>
+
+CLIENT -> SERVER: X-Mailer: PHPMailer 6.10.0 (https://github.com/PHPMailer/PHPMailer)
+
+CLIENT -> SERVER: MIME-Version: 1.0
+
+CLIENT -> SERVER: Content-Type: multipart/alternative;
+
+CLIENT -> SERVER:  boundary="b1=_BIMySytiuBd1axi0T1WAdEZSXbwwMUcSM4UTCRRaJQ"
+
+CLIENT -> SERVER: Content-Transfer-Encoding: 8bit
+
+CLIENT -> SERVER: 
+
+CLIENT -> SERVER: --b1=_BIMySytiuBd1axi0T1WAdEZSXbwwMUcSM4UTCRRaJQ
+
+CLIENT -> SERVER: Content-Type: text/plain; charset=us-ascii
+
+CLIENT -> SERVER: 
+
+CLIENT -> SERVER: Your password reset code is: 609694
+
+CLIENT -> SERVER: 
+
+CLIENT -> SERVER: --b1=_BIMySytiuBd1axi0T1WAdEZSXbwwMUcSM4UTCRRaJQ
+
+CLIENT -> SERVER: Content-Type: text/html; charset=us-ascii
+
+CLIENT -> SERVER: 
+
+CLIENT -> SERVER: <p>Your password reset code is: <strong>609694</strong></p>
+
+CLIENT -> SERVER: 
+
+CLIENT -> SERVER: 
+
+CLIENT -> SERVER: --b1=_BIMySytiuBd1axi0T1WAdEZSXbwwMUcSM4UTCRRaJQ--
+
+CLIENT -> SERVER: 
+
+CLIENT -> SERVER: .
+
+SERVER -> CLIENT: 250 2.0.0 OK  1746372982 d2e1a72fcca58-74058dc4641sm5157085b3a.66 - gsmtp
+
+CLIENT -> SERVER: QUIT
+
+SERVER -> CLIENT: 221 2.0.0 closing connection d2e1a72fcca58-74058dc4641sm5157085b3a.66 - gsmtp
+
