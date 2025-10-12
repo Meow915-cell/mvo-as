@@ -12,18 +12,28 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
 $module = 'customers';
 $access = restrictAccess($conn, $_SESSION['user_id'], $module);
 
-// Fetch all users and their pets' images and details, including age and medical_history
+// PHP and SQL query remain the same.
 $stmt = $conn->prepare("
-    SELECT u.id, u.name, u.email, u.phone, u.address, 
-           GROUP_CONCAT(p.id) AS pet_ids, 
-           GROUP_CONCAT(p.name) AS pet_names, 
-           GROUP_CONCAT(p.image) AS pet_images,
-           GROUP_CONCAT(p.age) AS pet_ages,
-           GROUP_CONCAT(p.medical_history) AS pet_medical_histories 
-    FROM users u 
-    LEFT JOIN pets p ON u.id = p.user_id 
-    WHERE u.role = 'user' 
-    GROUP BY u.id, u.name, u.email, u.phone, u.address 
+    SELECT 
+        u.id, u.name, u.email, u.phone, u.address,
+        -- Pet Details
+        GROUP_CONCAT(DISTINCT p.id SEPARATOR '|||') AS pet_ids,
+        GROUP_CONCAT(DISTINCT p.name SEPARATOR '|||') AS pet_names,
+        GROUP_CONCAT(DISTINCT p.image SEPARATOR '|||') AS pet_images,
+        GROUP_CONCAT(DISTINCT p.age SEPARATOR '|||') AS pet_ages,
+        GROUP_CONCAT(DISTINCT p.medical_history SEPARATOR '|||') AS pet_medical_histories,
+        -- Appointment Details
+        GROUP_CONCAT(a.appointment_date ORDER BY a.appointment_date DESC SEPARATOR '|||') AS appointment_dates,
+        GROUP_CONCAT(s.name ORDER BY a.appointment_date DESC SEPARATOR '|||') AS appointment_services,
+        GROUP_CONCAT(ap.name ORDER BY a.appointment_date DESC SEPARATOR '|||') AS appointment_pet_names,
+        GROUP_CONCAT(a.status ORDER BY a.appointment_date DESC SEPARATOR '|||') AS appointment_statuses
+    FROM users u
+    LEFT JOIN pets p ON u.id = p.user_id
+    LEFT JOIN appointments a ON u.id = a.user_id
+    LEFT JOIN services s ON a.service_id = s.id
+    LEFT JOIN pets ap ON a.pet_id = ap.id -- 'ap' for appointment pet
+    WHERE u.role = 'user'
+    GROUP BY u.id
     ORDER BY u.name ASC
 ");
 $stmt->execute();
@@ -60,11 +70,11 @@ $conn->close();
     ?>
 
     <main class="p-4 md:p-6">
-
+    <div  id="tableContainer">
         <div class="flex justify-between">
             <ol class="mb-4 text-muted-foreground flex flex-wrap items-center gap-1.5 text-sm break-words sm:gap-2.5">
                 <li class="inline-flex items-center gap-1.5 hover:cursor-pointer">
-                    <a class="text-lg font-medium hover:text-foreground transition-colors">Services</a>
+                    <a class="text-lg font-medium hover:text-foreground transition-colors">Customers</a>
                 </li>
             </ol>
         </div>
@@ -83,12 +93,8 @@ $conn->close();
                     </optgroup>
                 </select>
             </div>
-
-
         </div>
         <div class="overflow-x-auto ">
-
-
             <table id="usersTable" class="table">
                 <thead>
                     <tr>
@@ -98,28 +104,42 @@ $conn->close();
                         <th>Phone</th>
                         <th>Address</th>
                         <th>Total Pets</th>
-                        <th>Verified</th>
+                        <th>Email Verified</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php if ($users->num_rows > 0): ?>
                     <?php $no = 1; ?>
                     <?php while ($row = $users->fetch_assoc()): ?>
-                    <tr>
+                    
+                    <tr class=" hover:bg-gray-100"
+                        data-user-name="<?= htmlspecialchars($row['name']); ?>"
+                        data-user-email="<?= htmlspecialchars($row['email']); ?>"
+                        data-user-phone="<?= htmlspecialchars($row['phone']); ?>"
+                        data-user-address="<?= htmlspecialchars($row['address']); ?>"
+                        data-pet-names="<?= htmlspecialchars($row['pet_names']); ?>"
+                        data-pet-ages="<?= htmlspecialchars($row['pet_ages']); ?>"
+                        data-pet-images="<?= htmlspecialchars($row['pet_images']); ?>"
+                        data-pet-medical-histories="<?= htmlspecialchars($row['pet_medical_histories']); ?>"
+                        data-appointment-dates="<?= htmlspecialchars($row['appointment_dates']); ?>"
+                        data-appointment-services="<?= htmlspecialchars($row['appointment_services']); ?>"
+                        data-appointment-pet-names="<?= htmlspecialchars($row['appointment_pet_names']); ?>"
+                        data-appointment-statuses="<?= htmlspecialchars($row['appointment_statuses']); ?>"
+                    >
                         <td><?= $no++; ?></td>
                         <td><?= htmlspecialchars($row['name']); ?></td>
                         <td><?= htmlspecialchars($row['email']); ?></td>
                         <td><?= htmlspecialchars($row['phone']); ?></td>
                         <td><?= htmlspecialchars($row['address']); ?></td>
                         <td>
-                            <?= $row['pet_ids'] ? count(explode(',', $row['pet_ids'])) : 0; ?>
+                            <?= $row['pet_ids'] ? count(explode('|||', $row['pet_ids'])) : 0; ?>
                         </td>
                         <td>No</td>
                     </tr>
                     <?php endwhile; ?>
                     <?php else: ?>
                     <tr>
-                        <td colspan="6" class="text-center">No users found</td>
+                        <td colspan="7" class="text-center">No users found</td>
                     </tr>
                     <?php endif; ?>
                 </tbody>
@@ -128,19 +148,19 @@ $conn->close();
                 <ul class="flex flex-row items-center gap-1">
                     <li>
                         <a href="#" id="prevPage" class="btn-ghost">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24"
                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                 stroke-linejoin="round">
                                 <path d="m15 18-6-6 6-6" />
                             </svg>
-                            Previous
+                            Prev
                         </a>
                     </li>
                     <div id="pageNumbersContainer" class="flex gap-1"></div>
                     <li>
                         <a href="#" id="nextPage" class="btn-ghost">
                             Next
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24"
                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                 stroke-linejoin="round">
                                 <path d="m9 18 6-6-6-6" />
@@ -149,211 +169,173 @@ $conn->close();
                     </li>
                 </ul>
             </nav>
-
         </div>
+                    </div>
+<div id="userDetailsContainer" class="hidden ">
+   <ol class="mb-4 text-muted-foreground flex flex-wrap items-center gap-1.5 text-sm break-words sm:gap-2.5">
+                    <li class="inline-flex items-center gap-1.5 hover:cursor-pointer">
+                      <a id="backButton" class="flex items-center gap-2 text-lg font-medium hover:text-foreground transition-colors"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-undo2-icon lucide-undo-2"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 5.5 5.5a5.5 5.5 0 0 1-5.5 5.5H11"/></svg> Customers</a>
+                    </li>
+                    <li>
+                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-3.5"><path d="m9 18 6-6-6-6" /></svg>
+                    </li>
+                    <li class="inline-flex items-center gap-1.5">
+                        <a id="breadcrumb-customer-name" class="hover:text-foreground transition-colors">Details</a>
+                    </li>
+                  </ol>
+    <div id="userDetailsContent"></div>
+</div>
 
     </main>
 
-    <!-- Delete Dialog -->
-
-    <dialog id="alert-dialog" class="dialog" aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description">
-        <article class="w-md">
-            <header>
-                <h2 id="alert-dialog-title">Are you absolutely sure?</h2>
-                <p id="alert-dialog-description">
-                    This action cannot be undone. This will permanently delete this service.
-                </p>
-            </header>
-
-            <form id="deleteForm" action="../actions/manage_service.php" method="POST">
-                <input type="hidden" name="action" value="delete">
-                <input type="hidden" name="service_id" id="deleteServiceId">
-
-                <footer class="flex justify-end gap-2 mt-4">
-                    <button type="button" class="btn-outline"
-                        onclick="document.getElementById('alert-dialog').close()">Cancel</button>
-                    <button type="submit" class="btn-primary">Continue</button>
-                </footer>
-            </form>
-        </article>
-    </dialog>
-
-    <!-- Add Service Dialog -->
-
-    <dialog id="add-service" class="dialog w-full sm:max-w-[425px] max-h-[612px]"
-        onclick="if (event.target === this) this.close()">
-        <article class="w-md">
-            <header>
-                <h2>Add Service</h2>
-                <p>Enter the service details below. Click save when you're
-                    done.</p>
-            </header>
-
-            <section>
-                <form class="form grid gap-4" action="../actions/manage_service.php" method="POST">
-                    <input type="hidden" name="action" value="add">
-                    <div class="grid gap-3">
-                        <label for="name">Service Name</label>
-                        <input type="text" value="" id="name" name="name" autofocus />
-                    </div>
-                    <div class="grid gap-3">
-                        <label for="description">Description</label>
-                        <input type="text" value="" name="description" id="description" />
-                    </div>
-                    <div class="grid gap-3">
-                        <label for="price">Price</label>
-                        <input type="number" value="" name="price" id="price" />
-                    </div>
-                    <footer class="flex justify-end gap-2 mt-4">
-                        <button class="btn-outline" onclick="this.closest('dialog').close()">Cancel</button>
-                        <button type="submit" class="btn" onclick="this.closest('dialog').close()">Save changes</button>
-                    </footer>
-                </form>
-            </section>
-
-            <button type="button" aria-label="Close dialog" onclick="this.closest('dialog').close()">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                    class="lucide lucide-x-icon lucide-x">
-                    <path d="M18 6 6 18" />
-                    <path d="m6 6 12 12" />
-                </svg>
-            </button>
-        </article>
-    </dialog>
+    <script src="customers.js"></script>
 
     <script>
-    function openDeleteDialog(serviceId) {
-        document.getElementById('deleteServiceId').value = serviceId;
-        document.getElementById('alert-dialog').showModal();
-    }
-    </script>
-   <script>
-document.addEventListener("DOMContentLoaded", function() {
-    const tbody = document.querySelector("#usersTable tbody");
-    const rows = Array.from(tbody.querySelectorAll("tr"));
-    const rowsPerPageSelect = document.getElementById("rowsPerPage");
-    const searchInput = document.getElementById("searchInput");
-    const prevBtn = document.getElementById("prevPage");
-    const nextBtn = document.getElementById("nextPage");
-    const pageNumbersContainer = document.getElementById("pageNumbersContainer");
+        const table = document.getElementById('usersTable');
+        const tableContainer = document.getElementById('tableContainer');
+        const detailsContainer = document.getElementById('userDetailsContainer');
+        const detailsContent = document.getElementById('userDetailsContent');
+        const backButton = document.getElementById('backButton');
+        const separator = '|||';
 
-    let currentPage = 1;
-    let rowsPerPage = parseInt(rowsPerPageSelect.value);
+        table.querySelectorAll('tbody tr').forEach(row => {
+            if (row.dataset.userName) { 
+                row.addEventListener('click', () => {
+                    const {
+                        userName, userEmail, userPhone, userAddress,
+                        petNames: petNamesStr, petAges: petAgesStr, petImages: petImagesStr, petMedicalHistories: petMedicalHistoriesStr,
+                        appointmentDates: appointmentDatesStr, appointmentServices: appointmentServicesStr,
+                        appointmentPetNames: appointmentPetNamesStr, appointmentStatuses: appointmentStatusesStr
+                    } = row.dataset;
 
-    function filterRows() {
-        const term = searchInput.value.toLowerCase();
-        return rows.filter(row => row.textContent.toLowerCase().includes(term));
-    }
+                    // --- CHANGE 2: Update the breadcrumb text with the user's name ---
+                    document.getElementById('breadcrumb-customer-name').innerText = userName;
 
-    function renderTable() {
-        const filteredRows = filterRows();
-        const totalPages = Math.ceil(filteredRows.length / rowsPerPage);
+                    // --- User Details HTML ---
+                    const userDetailsHtml = `
+                        <div>
+                            <h2 class="text-md font-semibold mb-4 mt-4">Customer Details</h2>
+                            <div class="overflow-x-auto">
+                                <table class="table w-full">
+                                    <tbody>
+                                        <tr>
+                                            <td class="font-semibold text-gray-600 w-1/4">Name</td>
+                                            <td>${userName}</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="font-semibold text-gray-600 w-1/4">Email</td>
+                                            <td>${userEmail}</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="font-semibold text-gray-600">Phone</td>
+                                            <td>${userPhone}</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="font-semibold text-gray-600">Address</td>
+                                            <td>${userAddress}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    `;
 
-        // Hide all rows first
-        rows.forEach(r => r.style.display = "none");
+                    // --- Pets HTML ---
+                    let petsHtml = '<h2 class="text-md font-semibold mt-6 mb-4 mt-4">Pets</h2>';
+                    if (petNamesStr) {
+                        const petNames = petNamesStr.split(separator);
+                        const petAges = petAgesStr.split(separator);
+                        const petImages = petImagesStr.split(separator);
+                        const petMedicalHistories = petMedicalHistoriesStr.split(separator);
 
-        // Show only current page rows
-        const start = (currentPage - 1) * rowsPerPage;
-        const end = start + rowsPerPage;
-        filteredRows.slice(start, end).forEach(r => r.style.display = "");
+                        petsHtml += `
+                            <div class="overflow-x-auto">
+                                <table class="table w-full">
+                                    <thead>
+                                        <tr>
+                                            <th class="w-20">Image</th>
+                                            <th>Name</th>
+                                            <th>Age</th>
+                                            <th>Medical History</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                        `;
+                        petNames.forEach((name, index) => {
+                            const image = petImages[index] ? `../../uploads/${petImages[index]}` : 'https://via.placeholder.com/100';
+                            petsHtml += `
+                                <tr>
+                                    <td>
+                                        <img src="${image}" alt="${name}" class="w-16 h-16 object-cover rounded-md">
+                                    </td>
+                                    <td>${name}</td>
+                                    <td>${petAges[index] || 'N/A'}</td>
+                                    <td>${petMedicalHistories[index] || 'None'}</td>
+                                </tr>
+                            `;
+                        });
+                        petsHtml += '</tbody></table></div>';
+                    } else {
+                        petsHtml += '<p>No pets found for this customer.</p>';
+                    }
 
-        renderPagination(totalPages);
-    }
+                    // --- Appointments HTML ---
+                    let appointmentsHtml = '<br/><h2 class="text-md font-semibold mt-8 mb-4">Appointment History</h2>';
+                    if (appointmentDatesStr) {
+                        const appointmentDates = appointmentDatesStr.split(separator);
+                        const appointmentServices = appointmentServicesStr.split(separator);
+                        const appointmentPetNames = appointmentPetNamesStr.split(separator);
+                        const appointmentStatuses = appointmentStatusesStr.split(separator);
+                        
+                        appointmentsHtml += `
+                            <div class="overflow-x-auto">
+                                <table class="table w-full">
+                                    <thead>
+                                        <tr>
+                                            <th>Date</th>
+                                            <th>Pet</th>
+                                            <th>Service</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                        `;
+                        appointmentDates.forEach((date, index) => {
+                            const formattedDate = new Date(date).toLocaleDateString('en-US', {
+                                year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
+                            });
+                            appointmentsHtml += `
+                                <tr>
+                                    <td>${formattedDate}</td>
+                                    <td>${appointmentPetNames[index]}</td>
+                                    <td>${appointmentServices[index]}</td>
+                                    <td><span class="badge badge-outline-${appointmentStatuses[index].toLowerCase() === 'completed' ? 'success' : 'warning'}">${appointmentStatuses[index]}</span></td>
+                                </tr>
+                            `;
+                        });
+                        appointmentsHtml += '</tbody></table></div>';
+                    } else {
+                        appointmentsHtml += '<p>No appointment history found for this customer.</p>';
+                    }
 
-    function renderPagination(totalPages) {
-        pageNumbersContainer.innerHTML = "";
-
-        const maxPagesToShow = 5;
-        let startPage = Math.max(1, currentPage - 2);
-        let endPage = Math.min(totalPages, currentPage + 2);
-
-        if (currentPage <= 3) {
-            startPage = 1;
-            endPage = Math.min(maxPagesToShow, totalPages);
-        } else if (currentPage > totalPages - 2) {
-            startPage = Math.max(1, totalPages - maxPagesToShow + 1);
-            endPage = totalPages;
-        }
-
-        // First page + dots
-        if (startPage > 1) {
-            pageNumbersContainer.appendChild(createPageButton(1));
-            if (startPage > 2) pageNumbersContainer.appendChild(createDots());
-        }
-
-        // Middle pages
-        for (let i = startPage; i <= endPage; i++) {
-            pageNumbersContainer.appendChild(createPageButton(i));
-        }
-
-        // Last page + dots
-        if (endPage < totalPages) {
-            if (endPage < totalPages - 1) pageNumbersContainer.appendChild(createDots());
-            pageNumbersContainer.appendChild(createPageButton(totalPages));
-        }
-
-        // Enable/disable Prev/Next
-        prevBtn.classList.toggle("opacity-50 cursor-not-allowed", currentPage === 1);
-        nextBtn.classList.toggle("opacity-50 cursor-not-allowed", currentPage === totalPages);
-    }
-
-    function createPageButton(pageNum) {
-        const li = document.createElement("li");
-        const a = document.createElement("a");
-        a.href = "#";
-        a.textContent = pageNum;
-        a.className = pageNum === currentPage ? "btn-icon-outline" : "btn-icon-ghost";
-        a.addEventListener("click", (e) => {
-            e.preventDefault();
-            currentPage = pageNum;
-            renderTable();
+                    // --- Combine all details into the final HTML ---
+                    detailsContent.innerHTML = `
+                        ${userDetailsHtml}
+                        ${petsHtml}
+                        ${appointmentsHtml}
+                    `;
+                    
+                    tableContainer.style.display = 'none';
+                    detailsContainer.classList.remove('hidden');
+                });
+            }
         });
-        li.appendChild(a);
-        return li;
-    }
 
-    function createDots() {
-        const li = document.createElement("li");
-        li.innerHTML = `<div class="size-9 flex items-center justify-center"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-4 shrink-0"><circle cx="12" cy="12" r="1" /><circle cx="19" cy="12" r="1" /><circle cx="5" cy="12" r="1" /></svg></div>`;
-        return li;
-    }
-
-    // Prev/Next buttons
-    prevBtn.addEventListener("click", e => {
-        e.preventDefault();
-        if (currentPage > 1) currentPage--;
-        renderTable();
-    });
-
-    nextBtn.addEventListener("click", e => {
-        e.preventDefault();
-        const filteredRows = filterRows();
-        const totalPages = Math.ceil(filteredRows.length / rowsPerPage);
-        if (currentPage < totalPages) currentPage++;
-        renderTable();
-    });
-
-    // Rows per page and search
-    rowsPerPageSelect.addEventListener("change", () => {
-        rowsPerPage = parseInt(rowsPerPageSelect.value);
-        currentPage = 1;
-        renderTable();
-    });
-
-    searchInput.addEventListener("input", () => {
-        currentPage = 1;
-        renderTable();
-    });
-
-    renderTable();
-});
-</script>
-
-
-
-
+        backButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            detailsContainer.classList.add('hidden');
+            tableContainer.style.display = 'block';
+        });
+    </script>
 </body>
-
 </html>
