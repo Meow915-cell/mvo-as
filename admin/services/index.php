@@ -41,9 +41,7 @@ $conn->close();
     $current_page = basename($_SERVER['PHP_SELF']);
     include '../../components/sidebar.php';
     ?>
-
     <main class="p-4 md:p-6">
-
         <div class="flex justify-between">
             <ol class="mb-4 text-muted-foreground flex flex-wrap items-center gap-1.5 text-sm break-words sm:gap-2.5">
                 <li class="inline-flex items-center gap-1.5 hover:cursor-pointer">
@@ -53,8 +51,6 @@ $conn->close();
             <button class="btn-sm" onclick="document.getElementById('add-service').showModal()">Add
                 Service</button>
         </div>
-
-
 
         <div class="overflow-x-auto mt-4">
             <table class="table">

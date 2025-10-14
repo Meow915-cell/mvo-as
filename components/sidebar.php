@@ -13,7 +13,7 @@ aside nav summary {
 
 <aside class="sidebar " data-side="left" aria-hidden="false" >
     <nav aria-label="Sidebar navigation ">
-        <section class="scrollbar ">
+        <section class="scrollbar">
             <div class="rounded-sm m-2 flex gap-2 items-center" style="width: calc(100% - 1rem)">
                 <img class="size-12 object-cover rounded-full" alt="logo" src="../../logo.png" />
                 <h2 class="font-semibold text-sm">Municipality Vetrinary Office</h2>
@@ -150,6 +150,25 @@ aside nav summary {
                                 <path d="M16 18h.01" />
                             </svg>
                             <span>Schedules</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="../schedules">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" class="lucide lucide-calendar-days-icon lucide-calendar-days">
+                                <path d="M8 2v4" />
+                                <path d="M16 2v4" />
+                                <rect width="18" height="18" x="3" y="4" rx="2" />
+                                <path d="M3 10h18" />
+                                <path d="M8 14h.01" />
+                                <path d="M12 14h.01" />
+                                <path d="M16 14h.01" />
+                                <path d="M8 18h.01" />
+                                <path d="M12 18h.01" />
+                                <path d="M16 18h.01" />
+                            </svg>
+                            <span>Drugs</span>
                         </a>
                     </li>
                     <h3 id="group-label-content-1">Others</h3>
