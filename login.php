@@ -5,9 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login / Signup - Municipal Veterinary Office</title>
-    
-      <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-      <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/login.css">
     <style>
         .forgot-password {
@@ -54,14 +54,14 @@
 
         <!-- Sign In Form -->
         <div class="form-container sign-in-container">
-            
-            <form action="actions/login_action.php" method="POST" >
-                <div class="flex-container" >
+
+            <form action="actions/login_action.php" method="POST">
+                <div class="flex-container">
                     <img src="img/logo.png" alt="Logo">
                     <h1>Sign In</h1>
                 </div>
                 <div>
-                   
+
 
                 </div>
                 <?php if (isset($_GET['error'])): ?>
