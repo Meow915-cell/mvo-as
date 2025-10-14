@@ -33,10 +33,11 @@ $conn->close();
     <script src="https://cdn.jsdelivr.net/npm/basecoat-css@0.3.2/dist/js/all.min.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/basecoat-css@0.3.2/dist/js/basecoat.min.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/basecoat-css@0.3.2/dist/js/sidebar.min.js" defer></script>
-   
+
 </head>
 
 <body>
+
     <?php
     $current_page = basename($_SERVER['PHP_SELF']);
     include '../../components/sidebar.php';
@@ -76,24 +77,10 @@ $conn->close();
                             <div class="flex gap-2 w-full justify-end">
                                 <button class="btn-sm-outline py-0 text-xs"
                                     onclick="openEditModal(<?= htmlspecialchars($row['id']); ?>)">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 24 24"
-                                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                        stroke-linejoin="round" class="lucide lucide-pencil-icon lucide-pencil">
-                                        <path
-                                            d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z" />
-                                        <path d="m15 5 4 4" />
-                                    </svg>
                                     Edit
                                 </button>
                                 <button type="button" class="btn-sm-destructive py-0 text-xs"
                                     onclick="openDeleteDialog(<?= htmlspecialchars($row['id']); ?>)">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 24 24"
-                                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                        stroke-linejoin="round" class="lucide lucide-trash-icon lucide-trash">
-                                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" />
-                                        <path d="M3 6h18" />
-                                        <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-                                    </svg>
                                     Delete
                                 </button>
 
@@ -258,6 +245,58 @@ $conn->close();
                 alert('Failed to load service data. Please try again.');
             });
     }
+    </script>
+
+    <div id="toaster" class="toaster"></div>
+    <script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const url = new URL(window.location);
+        const params = url.searchParams;
+        const toaster = document.getElementById("toaster");
+
+        // Clear params BEFORE triggering toast display
+        if (params.has("success") || params.has("error")) {
+            const successMsg = params.get("success");
+            const errorMsg = params.get("error");
+
+            // Replace URL immediately 
+            url.search = "";
+            window.history.replaceState({}, document.title, url.toString());
+
+            // Now show toast after clearing URL
+            setTimeout(() => {
+                if (successMsg) showToast("success", "Success", successMsg);
+                if (errorMsg) showToast("error", "Error", errorMsg);
+            }, 10);
+        }
+
+        function showToast(type, title, message) {
+            const toast = document.createElement("div");
+            toast.className = "toast";
+            toast.setAttribute("data-category", type);
+            toast.innerHTML = `
+          <div class="toast-content">
+            <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30"
+                viewBox="0 0 24 24" fill="none" 
+                stroke="${type === 'success' ? '#22c55e' : '#ef4444'}" 
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                ${type === "success"
+                ? `<circle cx="12" cy="12" r="10" />
+                    <path d="m9 12 2 2 4-4" />`
+                : `<circle cx="12" cy="12" r="10" />
+                    <line x1="15" y1="9" x2="9" y2="15" />
+                    <line x1="9" y1="9" x2="15" y2="15" />`}
+            </svg>
+            <section>
+                <h2>${title}</h2>
+                <p>${message}</p>
+            </section>
+            </div>
+        `;
+            toaster.appendChild(toast);
+            setTimeout(() => toast.remove(), 4000);
+        }
+    });
     </script>
 
 </body>

@@ -38,7 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     if ($action === 'add') {
         // --- ADD Logic ---
         if (empty($owner_name) || empty($pet_name)) {
-            header("Location: ../walkin/index.php?error=Owner and Pet name are required");
+            header("Location: ../walk-in/?error=Owner and Pet name are required");
             exit();
         }
 
@@ -46,17 +46,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         $stmt->bind_param("sssdssdss", $owner_name, $pet_name, $type, $age, $breed, $favorite_activity, $medical_history, $body_temp, $weight);
 
         if ($stmt->execute()) {
-            header("Location: ../walkin/index.php?success=Walk-in record added successfully");
+            header("Location: ../walk-in/?success=Walk-in record added successfully");
         } else {
             error_log("Failed to add walk-in record: " . $stmt->error);
-            header("Location: ../walkin/index.php?error=Failed to add record");
+            header("Location: ../walk-in/?error=Failed to add record");
         }
         $stmt->close();
 
     } elseif ($action === 'edit') {
         // --- EDIT Logic ---
         if (empty($walkin_id) || empty($owner_name) || empty($pet_name)) {
-            header("Location: ../walkin/index.php?error=ID, Owner, and Pet name are required for edit");
+            header("Location: ../walk-in/?error=ID, Owner, and Pet name are required for edit");
             exit();
         }
 
@@ -65,20 +65,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 
         if ($stmt->execute()) {
             if ($stmt->affected_rows > 0) {
-                header("Location: ../walkin/index.php?success=Walk-in record updated successfully");
+                header("Location: ../walk-in/?success=Walk-in record updated successfully");
             } else {
-                header("Location: ../walkin/index.php?info=No changes made to the record");
+                header("Location: ../walk-in/?info=No changes made to the record");
             }
         } else {
             error_log("Failed to edit walk-in record ID $walkin_id: " . $stmt->error);
-            header("Location: ../walkin/index.php?error=Failed to update record");
+            header("Location: ../walk-in/?error=Failed to update record");
         }
         $stmt->close();
 
     } elseif ($action === 'delete') {
         // --- DELETE Logic ---
         if (empty($walkin_id)) {
-            header("Location: ../walkin/index.php?error=ID is required for deletion");
+            header("Location: ../walk-in/hp?error=ID is required for deletion");
             exit();
         }
 
@@ -88,26 +88,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         if ($stmt->execute()) {
             if ($stmt->affected_rows > 0) {
                 error_log("Walk-in record deleted successfully: ID=$walkin_id");
-                header("Location: ../walkin/index.php?success=Walk-in record deleted successfully");
+                header("Location: ../walk-in/?success=Walk-in record deleted successfully");
             } else {
                 error_log("No walk-in record was deleted: ID=$walkin_id");
-                header("Location: ../walkin/index.php?error=Record not found or already deleted");
+                header("Location: ../walk-in/?error=Record not found or already deleted");
             }
         } else {
             $error_message = $conn->error;
             error_log("Failed to delete walk-in record ID $walkin_id: $error_message");
-            header("Location: ../walkin/index.php?error=Failed to delete record: " . urlencode($error_message));
+            header("Location: ../walk-in/?error=Failed to delete record: " . urlencode($error_message));
         }
         $stmt->close();
 
     } else {
         error_log("Invalid action received: $action");
-        header("Location: ../walkin/index.php?error=Invalid action");
+        header("Location: ../walk-in/?error=Invalid action");
     }
 
 } else {
     error_log("Invalid request method or missing action.");
-    header("Location: ../walkin/index.php?error=Invalid request");
+    header("Location: ../walk-in/?error=Invalid request");
 }
 
 $conn->close();

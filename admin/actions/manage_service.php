@@ -16,16 +16,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         $price = floatval($_POST['price']);
 
         if (empty($name) || $price < 0) {
-            header("Location: ../services.php?error=Invalid input data");
+            header("Location: ../services/index.php?error=Invalid input data");
             exit();
         }
 
         $stmt = $conn->prepare("INSERT INTO services (name, description, price) VALUES (?, ?, ?)");
         $stmt->bind_param("ssd", $name, $description, $price);
         if ($stmt->execute()) {
-            header("Location: ../services.php?success=Service added successfully");
+            header("Location: ../services/index.php?success=Service added successfully");
         } else {
-            header("Location: ../services.php?error=Failed to add service");
+            header("Location: ../services/index.php?error=Failed to add service");
         }
         $stmt->close();
     } elseif ($action === 'edit' && isset($_POST['service_id'])) {
@@ -35,16 +35,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         $price = floatval($_POST['price']);
 
         if (empty($name) || $price < 0) {
-            header("Location: ../services.php?error=Invalid input data");
+            header("Location: ../services/index.php?error=Invalid input data");
             exit();
         }
 
         $stmt = $conn->prepare("UPDATE services SET name = ?, description = ?, price = ? WHERE id = ?");
         $stmt->bind_param("ssdi", $name, $description, $price, $service_id);
         if ($stmt->execute()) {
-            header("Location: ../services.php?success=Service updated successfully");
+            header("Location: ../services/index.php?success=Service updated successfully");
         } else {
-            header("Location: ../services.php?error=Failed to update service");
+            header("Location: ../services/index.php?error=Failed to update service");
         }
         $stmt->close();
     } elseif ($action === 'delete' && isset($_POST['service_id'])) {
@@ -52,16 +52,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         $stmt = $conn->prepare("DELETE FROM services WHERE id = ?");
         $stmt->bind_param("i", $service_id);
         if ($stmt->execute()) {
-            header("Location: ../services.php?success=Service deleted successfully");
+            header("Location: ../services/index.php?success=Service deleted successfully");
         } else {
-            header("Location: ../services.php?error=Failed to delete service");
+        header("Location: ../services/index.php?error=Cannot delete service while it is still linked to existing appointments.");
         }
         $stmt->close();
     } else {
-        header("Location: ../services.php?error=Invalid action");
+        header("Location: ../services/index.php?error=Invalid action");
     }
 } else {
-    header("Location: ../services.php?error=Invalid request");
+    header("Location: ../services/index.php?error=Invalid request");
 }
 
 $conn->close();

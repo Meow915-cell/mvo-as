@@ -3,6 +3,7 @@ session_start();
 require_once '../../db/db_connect.php';
 require_once '../restrict_access.php'; // Include the access control script
 
+// Check if user is logged in and is an admin
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     header("Location: login.php");
     exit();
@@ -11,6 +12,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
 // Check access for veterinarians module
 $module = 'veterinarians';
 $access = restrictAccess($conn, $_SESSION['user_id'], $module);
+// Note: You might want to add a check like `if (!$access)` and redirect/display an error here.
 
 // Verify database connection
 if ($conn->connect_error) {
@@ -35,6 +37,7 @@ $conn->close();
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Manage Veterinarians</title>
     <link href="../../src/output.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/basecoat-css@0.3.2/dist/basecoat.cdn.min.css" />
     <script src="https://cdn.jsdelivr.net/npm/basecoat-css@0.3.2/dist/js/all.min.js" defer></script>
@@ -54,21 +57,22 @@ $conn->close();
         <div class="flex justify-between">
             <ol class="mb-4 text-muted-foreground flex flex-wrap items-center gap-1.5 text-sm break-words sm:gap-2.5">
                 <li class="inline-flex items-center gap-1.5 hover:cursor-pointer">
-                    <a class="text-lg font-medium hover:text-foreground transition-colors">Services</a>
+                    <a class="text-lg font-medium hover:text-foreground transition-colors">Veterinarians</a>
                 </li>
             </ol>
-            <button class="btn-sm" onclick="document.getElementById('add-service').showModal()">Add
-                Service</button>
+            <button class="btn-sm" onclick="document.getElementById('add-veterinarian').showModal()">Add
+                Veterinarian</button>
         </div>
 
 
 
         <div class="overflow-x-auto mt-4">
             <table class="table">
-                <caption>List of Available Services</caption>
+                <caption>List of Veterinarians</caption>
                 <thead>
                     <tr>
                         <th>Photo</th>
+                        <th>ID</th>
                         <th>Name</th>
                         <th>Email</th>
                         <th>Phone</th>
@@ -81,13 +85,13 @@ $conn->close();
                         <?php while ($row = $veterinarians->fetch_assoc()): ?>
                             <tr>
                                 <td><img src="<?php echo $row['image'] ? '../../Uploads/' . htmlspecialchars($row['image']) : 'https://placehold.co/50x50?text=Vet'; ?>"
-                                        alt="Veterinarian" style="width: 50px; height: 50px;"></td>
+                                        alt="Veterinarian" style="width: 50px; height: 50px; object-fit: cover;"></td>
                                 <td class="font-medium"><?= htmlspecialchars($row['id']); ?></td>
                                 <td><?= htmlspecialchars($row['name']); ?></td>
                                 <td><?= htmlspecialchars($row['email']); ?></td>
-                                <td><?= htmlspecialchars($row['phone']); ?></td>
-                                <td><?= htmlspecialchars($row['specialization']); ?></td>
-                                <td>
+                                <td><?= htmlspecialchars($row['phone'] ?? 'N/A'); ?></td>
+                                <td><?= htmlspecialchars($row['specialization'] ?? 'General'); ?></td>
+                                <td class="text-right">
                                     <div class="flex gap-2 w-full justify-end">
                                         <button class="btn-sm-outline py-0 text-xs"
                                             onclick="openEditModal(<?= htmlspecialchars($row['id']); ?>)">
@@ -118,7 +122,7 @@ $conn->close();
                         <?php endwhile; ?>
                     <?php else: ?>
                         <tr>
-                            <td colspan="4" class="text-center">No services found</td>
+                            <td colspan="7" class="text-center">No veterinarians found</td>
                         </tr>
                     <?php endif; ?>
                 </tbody>
@@ -134,13 +138,13 @@ $conn->close();
             <header>
                 <h2 id="alert-dialog-title">Are you absolutely sure?</h2>
                 <p id="alert-dialog-description">
-                    This action cannot be undone. This will permanently delete this service.
+                    This action cannot be undone. This will permanently delete this veterinarian.
                 </p>
             </header>
 
-            <form id="deleteForm" action="../actions/manage_service.php" method="POST">
+            <form id="deleteForm" action="../actions/manage_veterinarian.php" method="POST">
                 <input type="hidden" name="action" value="delete">
-                <input type="hidden" name="service_id" id="deleteServiceId">
+                <input type="hidden" name="vet_id" id="deleteVetId"> <!-- Corrected name from service_id to vet_id -->
 
                 <footer class="flex justify-end gap-2 mt-4">
                     <button type="button" class="btn-outline"
@@ -151,35 +155,44 @@ $conn->close();
         </article>
     </dialog>
 
-    <!-- Add Service Dialog -->
+    <!-- Add Veterinarian Dialog (Corrected) -->
 
-    <dialog id="add-service" class="dialog w-full sm:max-w-[425px] max-h-[612px]"
+    <dialog id="add-veterinarian" class="dialog w-full sm:max-w-[425px] max-h-[612px]"
         onclick="if (event.target === this) this.close()">
         <article class="w-md">
             <header>
-                <h2>Add Service</h2>
-                <p>Enter the service details below. Click save when you're
+                <h2>Add Veterinarian</h2>
+                <p>Enter the veterinarian details below. Click save when you're
                     done.</p>
             </header>
 
             <section>
-                <form class="form grid gap-4" action="../actions/manage_service.php" method="POST">
+                <form class="form grid gap-4" action="../actions/manage_veterinarian.php" method="POST" enctype="multipart/form-data">
                     <input type="hidden" name="action" value="add">
                     <div class="grid gap-3">
-                        <label for="name">Service Name</label>
-                        <input type="text" value="" id="name" name="name" autofocus />
+                        <label for="add_name">Name</label>
+                        <input type="text" value="" id="add_name" name="name" autofocus required />
                     </div>
                     <div class="grid gap-3">
-                        <label for="description">Description</label>
-                        <input type="text" value="" name="description" id="description" />
+                        <label for="add_email">Email</label>
+                        <input type="email" value="" name="email" id="add_email" required />
                     </div>
                     <div class="grid gap-3">
-                        <label for="price">Price</label>
-                        <input type="number" value="" name="price" id="price" />
+                        <label for="add_phone">Phone (Optional)</label>
+                        <input type="text" value="" name="phone" id="add_phone" />
                     </div>
+                    <div class="grid gap-3">
+                        <label for="add_specialization">Specialization (Optional)</label>
+                        <input type="text" value="" name="specialization" id="add_specialization" />
+                    </div>
+                    <div class="grid gap-3">
+                        <label for="add_image">Photo (Optional)</label>
+                        <input type="file" name="image" id="add_image" accept="image/jpeg,image/png" />
+                    </div>
+
                     <footer class="flex justify-end gap-2 mt-4">
-                        <button class="btn-outline" onclick="this.closest('dialog').close()">Cancel</button>
-                        <button type="submit" class="btn" onclick="this.closest('dialog').close()">Save changes</button>
+                        <button type="button" class="btn-outline" onclick="this.closest('dialog').close()">Cancel</button>
+                        <button type="submit" class="btn">Save changes</button>
                     </footer>
                 </form>
             </section>
@@ -195,31 +208,40 @@ $conn->close();
         </article>
     </dialog>
 
-    <!-- Edit Service Dialog -->
-    <dialog id="edit-service" class="dialog w-full sm:max-w-[425px] max-h-[612px]"
+    <!-- Edit Veterinarian Dialog (Corrected) -->
+    <dialog id="edit-veterinarian" class="dialog w-full sm:max-w-[425px] max-h-[612px]"
         onclick="if (event.target === this) this.close()">
         <article class="w-md">
             <header>
-                <h2>Edit Service</h2>
-                <p>Update the service details below. Click save when you're done.</p>
+                <h2>Edit Veterinarian</h2>
+                <p>Update the veterinarian details below. Click save when you're done.</p>
             </header>
 
             <section>
-                <form class="form grid gap-4" action="../actions/manage_service.php" method="POST">
+                <form class="form grid gap-4" action="../actions/manage_veterinarian.php" method="POST" enctype="multipart/form-data">
                     <input type="hidden" name="action" value="edit">
-                    <input type="hidden" name="service_id" id="edit_service_id">
+                    <input type="hidden" name="vet_id" id="edit_vet_id"> <!-- Corrected name from service_id to vet_id -->
 
                     <div class="grid gap-3">
-                        <label for="edit_name">Service Name</label>
-                        <input type="text" name="name" id="edit_name" autofocus />
+                        <label for="edit_name">Name</label>
+                        <input type="text" name="name" id="edit_name" autofocus required />
                     </div>
                     <div class="grid gap-3">
-                        <label for="edit_description">Description</label>
-                        <input type="text" name="description" id="edit_description" />
+                        <label for="edit_email">Email</label>
+                        <input type="email" name="email" id="edit_email" required />
                     </div>
                     <div class="grid gap-3">
-                        <label for="edit_price">Price</label>
-                        <input type="number" name="price" id="edit_price" />
+                        <label for="edit_phone">Phone (Optional)</label>
+                        <input type="text" name="phone" id="edit_phone" />
+                    </div>
+                    <div class="grid gap-3">
+                        <label for="edit_specialization">Specialization (Optional)</label>
+                        <input type="text" name="specialization" id="edit_specialization" />
+                    </div>
+                    <div class="grid gap-3">
+                        <label for="edit_image">Photo (Replace existing, Optional)</label>
+                        <input type="file" name="image" id="edit_image" accept="image/jpeg,image/png" />
+                        <small class="text-muted-foreground">Leave empty to keep the current photo.</small>
                     </div>
 
                     <footer class="flex justify-end gap-2 mt-4">
@@ -243,13 +265,14 @@ $conn->close();
 
 
     <script>
-        function openDeleteDialog(serviceId) {
-            document.getElementById('deleteServiceId').value = serviceId;
+        function openDeleteDialog(vetId) {
+            document.getElementById('deleteVetId').value = vetId; // Corrected ID
             document.getElementById('alert-dialog').showModal();
         }
 
-        function openEditModal(serviceId) {
-            fetch(`../actions/get_service.php?id=${serviceId}`)
+        function openEditModal(vetId) {
+            // Updated fetch URL to use get_veterinarian.php
+            fetch(`../actions/get_veterinarian.php?id=${vetId}`)
                 .then(response => {
                     if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
                     return response.json();
@@ -259,18 +282,19 @@ $conn->close();
                         alert('Error: ' + data.error);
                         return;
                     }
-                    // Fill the fields
-                    document.getElementById('edit_service_id').value = data.id;
+                    // Fill the fields, using the properties from get_veterinarian.php
+                    document.getElementById('edit_vet_id').value = data.id;
                     document.getElementById('edit_name').value = data.name;
-                    document.getElementById('edit_description').value = data.description || '';
-                    document.getElementById('edit_price').value = data.price;
+                    document.getElementById('edit_email').value = data.email;
+                    document.getElementById('edit_phone').value = data.phone || ''; // Handle null/empty phone
+                    document.getElementById('edit_specialization').value = data.specialization || ''; // Handle null/empty specialization
 
                     // Show the modal
-                    document.getElementById('edit-service').showModal();
+                    document.getElementById('edit-veterinarian').showModal(); // Corrected ID
                 })
                 .catch(error => {
                     console.error('Fetch error:', error.message);
-                    alert('Failed to load service data. Please try again.');
+                    alert('Failed to load veterinarian data. Please try again.');
                 });
         }
     </script>

@@ -103,25 +103,11 @@ $conn->close();
                                 <!-- Changed function call to match the new context -->
                                 <button class="btn-sm-outline py-0 text-xs"
                                     onclick="openEditWalkinModal(<?= htmlspecialchars($row['id']); ?>)">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 24 24"
-                                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                        stroke-linejoin="round" class="lucide lucide-pencil-icon lucide-pencil">
-                                        <path
-                                            d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z" />
-                                        <path d="m15 5 4 4" />
-                                    </svg>
                                     Edit
                                 </button>
                                 <!-- Changed function call to match the new context -->
                                 <button type="button" class="btn-sm-destructive py-0 text-xs"
                                     onclick="openDeleteWalkinDialog(<?= htmlspecialchars($row['id']); ?>)">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 24 24"
-                                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                        stroke-linejoin="round" class="lucide lucide-trash-icon lucide-trash">
-                                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" />
-                                        <path d="M3 6h18" />
-                                        <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-                                    </svg>
                                     Delete
                                 </button>
 
@@ -229,15 +215,15 @@ $conn->close();
     </dialog>
 
     <!-- Edit Walk-in Dialog -->
-    <dialog id="edit-walkin" class="dialog w-full sm:max-w-[425px] max-h-[85vh] overflow-y-auto"
+    <dialog id="edit-walkin" class="dialog w-full sm:max-w-[425px] max-h-[85vh]"
         onclick="if (event.target === this) this.close()">
-        <article class="w-md">
+        <article class="w-md max-h-[85vh]">
             <header>
                 <h2>Edit Walk-in Record</h2>
                 <p>Update the pet and owner details below. Click save when you're done.</p>
             </header>
 
-            <section>
+            <section class="overflow-y-auto">
                  <!-- Need to update this form action/inputs for walkin management -->
                 <form class="form grid gap-4" action="../actions/manage_walkin.php" method="POST">
                     <input type="hidden" name="action" value="edit">
@@ -331,6 +317,57 @@ $conn->close();
                 alert('Failed to load walk-in data. Please try again.');
             });
     }
+    </script>
+<div id="toaster" class="toaster"></div>
+    <script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const url = new URL(window.location);
+        const params = url.searchParams;
+        const toaster = document.getElementById("toaster");
+
+        // Clear params BEFORE triggering toast display
+        if (params.has("success") || params.has("error")) {
+            const successMsg = params.get("success");
+            const errorMsg = params.get("error");
+
+            // Replace URL immediately 
+            url.search = "";
+            window.history.replaceState({}, document.title, url.toString());
+
+            // Now show toast after clearing URL
+            setTimeout(() => {
+                if (successMsg) showToast("success", "Success", successMsg);
+                if (errorMsg) showToast("error", "Error", errorMsg);
+            }, 10);
+        }
+
+        function showToast(type, title, message) {
+            const toast = document.createElement("div");
+            toast.className = "toast";
+            toast.setAttribute("data-category", type);
+            toast.innerHTML = `
+          <div class="toast-content">
+            <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30"
+                viewBox="0 0 24 24" fill="none" 
+                stroke="${type === 'success' ? '#22c55e' : '#ef4444'}" 
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                ${type === "success"
+                ? `<circle cx="12" cy="12" r="10" />
+                    <path d="m9 12 2 2 4-4" />`
+                : `<circle cx="12" cy="12" r="10" />
+                    <line x1="15" y1="9" x2="9" y2="15" />
+                    <line x1="9" y1="9" x2="15" y2="15" />`}
+            </svg>
+            <section>
+                <h2>${title}</h2>
+                <p>${message}</p>
+            </section>
+            </div>
+        `;
+            toaster.appendChild(toast);
+            setTimeout(() => toast.remove(), 4000);
+        }
+    });
     </script>
 
 </body>
