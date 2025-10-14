@@ -35,7 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     if ($stmt->execute()) {
         if ($stmt->affected_rows > 0) {
             error_log("User deleted successfully: user_id=$user_id");
-            header("Location: ../customers.php?success=User and related data deleted successfully");
+            header("Location: ../customers/index.php?success=User and related data deleted successfully");
         } else {
             error_log("No user was deleted: user_id=$user_id");
             header("Location: ../customers.php?error=No user was deleted");

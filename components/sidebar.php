@@ -11,9 +11,9 @@ aside nav summary {
 }
 </style>
 
-<aside class="sidebar" data-side="left" aria-hidden="false">
-    <nav aria-label="Sidebar navigation">
-        <section class="scrollbar">
+<aside class="sidebar " data-side="left" aria-hidden="false" >
+    <nav aria-label="Sidebar navigation ">
+        <section class="scrollbar ">
             <div class="rounded-sm m-2 flex gap-2 items-center" style="width: calc(100% - 1rem)">
                 <img class="size-12 object-cover rounded-full" alt="logo" src="../../logo.png" />
                 <h2 class="font-semibold text-sm">Municipality Vetrinary Office</h2>
@@ -85,6 +85,12 @@ aside nav summary {
                             </ul>
                         </details>
 
+                    </li>
+                    <li>
+                        <a href="../walk-in">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-notebook-tabs-icon lucide-notebook-tabs"><path d="M2 6h4"/><path d="M2 10h4"/><path d="M2 14h4"/><path d="M2 18h4"/><rect width="16" height="20" x="4" y="2" rx="2"/><path d="M15 2v20"/><path d="M15 7h5"/><path d="M15 12h5"/><path d="M15 17h5"/></svg>
+                            <span>Walk-in</span>
+                        </a>
                     </li>
                     <h3 id="group-label-content-1">Management</h3>
                     <li>
