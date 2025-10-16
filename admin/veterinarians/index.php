@@ -12,7 +12,6 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
 // Check access for veterinarians module
 $module = 'veterinarians';
 $access = restrictAccess($conn, $_SESSION['user_id'], $module);
-// Note: You might want to add a check like `if (!$access)` and redirect/display an error here.
 
 // Verify database connection
 if ($conn->connect_error) {
@@ -60,7 +59,7 @@ $conn->close();
                     <a class="text-lg font-medium hover:text-foreground transition-colors">Veterinarians</a>
                 </li>
             </ol>
-            <button class="btn-sm" onclick="document.getElementById('add-veterinarian').showModal()">Add
+            <button class="btn-sm bg-sky-500" onclick="document.getElementById('add-veterinarian').showModal()">Add
                 Veterinarian</button>
         </div>
 
@@ -97,7 +96,7 @@ $conn->close();
                                             onclick="openEditModal(<?= htmlspecialchars($row['id']); ?>)">
                                             Edit
                                         </button>
-                                        <button type="button" class="btn-sm-destructive py-0 text-xs"
+                                        <button type="button" class="btn-sm py-0 text-xs bg-rose-500" 
                                             onclick="openDeleteDialog(<?= htmlspecialchars($row['id']); ?>)">
                                             Delete
                                         </button>
@@ -141,7 +140,7 @@ $conn->close();
         </article>
     </dialog>
 
-    <!-- Add Veterinarian Dialog (Corrected) -->
+    <!-- Add Veterinarian Dialog -->
 
     <dialog id="add-veterinarian" class="dialog w-full sm:max-w-[425px] max-h-[612px]"
         onclick="if (event.target === this) this.close()">
@@ -178,7 +177,7 @@ $conn->close();
 
                     <footer class="flex justify-end gap-2 mt-4">
                         <button type="button" class="btn-outline" onclick="this.closest('dialog').close()">Cancel</button>
-                        <button type="submit" class="btn">Save changes</button>
+                        <button type="submit" class="btn bg-sky-500">Save changes</button>
                     </footer>
                 </form>
             </section>
@@ -194,7 +193,7 @@ $conn->close();
         </article>
     </dialog>
 
-    <!-- Edit Veterinarian Dialog (Corrected) -->
+    <!-- Edit Veterinarian Dialog -->
     <dialog id="edit-veterinarian" class="dialog w-full sm:max-w-[425px] max-h-[612px]"
         onclick="if (event.target === this) this.close()">
         <article class="w-md">
@@ -206,7 +205,7 @@ $conn->close();
             <section>
                 <form class="form grid gap-4" action="../actions/manage_veterinarian.php" method="POST" enctype="multipart/form-data">
                     <input type="hidden" name="action" value="edit">
-                    <input type="hidden" name="vet_id" id="edit_vet_id"> <!-- Corrected name from service_id to vet_id -->
+                    <input type="hidden" name="vet_id" id="edit_vet_id">
 
                     <div class="grid gap-3">
                         <label for="edit_name">Name</label>
@@ -233,7 +232,7 @@ $conn->close();
                     <footer class="flex justify-end gap-2 mt-4">
                         <button type="button" class="btn-outline"
                             onclick="this.closest('dialog').close()">Cancel</button>
-                        <button type="submit" class="btn">Save changes</button>
+                        <button type="submit" class="btn bg-sky-500">Save changes</button>
                     </footer>
                 </form>
             </section>
@@ -252,7 +251,7 @@ $conn->close();
 
     <script>
         function openDeleteDialog(vetId) {
-            document.getElementById('deleteVetId').value = vetId; // Corrected ID
+            document.getElementById('deleteVetId').value = vetId;
             document.getElementById('alert-dialog').showModal();
         }
 
@@ -276,7 +275,7 @@ $conn->close();
                     document.getElementById('edit_specialization').value = data.specialization || ''; // Handle null/empty specialization
 
                     // Show the modal
-                    document.getElementById('edit-veterinarian').showModal(); // Corrected ID
+                    document.getElementById('edit-veterinarian').showModal();
                 })
                 .catch(error => {
                     console.error('Fetch error:', error.message);

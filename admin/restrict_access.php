@@ -1,5 +1,4 @@
 <?php
-// restrict_access.php
 function restrictAccess($conn, $user_id, $module) {
     // Fetch user permissions
     $stmt = $conn->prepare("SELECT permissions FROM users WHERE id = ? AND role = 'admin'");

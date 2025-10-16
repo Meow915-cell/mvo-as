@@ -102,7 +102,7 @@ $conn->close();
                                     onclick="openEditWalkinModal(<?= htmlspecialchars($row['id']); ?>)">
                                     Edit
                                 </button>
-                                <button type="button" class="btn-sm-destructive py-0 text-xs"
+                                <button type="button" class="btn-sm bg-rose-500 py-0 text-xs"
                                     onclick="openDeleteWalkinDialog(<?= htmlspecialchars($row['id']); ?>)">
                                     Delete
                                 </button>
@@ -191,7 +191,7 @@ $conn->close();
                     
                     <footer class="flex justify-end gap-2 mt-4">
                         <button type="button" class="btn-outline" onclick="this.closest('dialog').close()">Cancel</button>
-                        <button type="submit" class="btn">Save changes</button>
+                        <button type="submit" class="btn bg-sky-500">Save changes</button>
                     </footer>
                 </form>
             </section>
@@ -217,12 +217,10 @@ $conn->close();
             </header>
 
             <section class="overflow-y-auto">
-                 <!-- Need to update this form action/inputs for walkin management -->
                 <form class="form grid gap-4" action="../actions/manage_walkin.php" method="POST">
                     <input type="hidden" name="action" value="edit">
                     <input type="hidden" name="walkin_id" id="edit_walkin_id">
 
-                     <!-- Example inputs for walkin table -->
                     <div class="grid gap-3">
                         <label for="edit_owner_name">Owner Name</label>
                         <input type="text" name="owner_name" id="edit_owner_name" autofocus required />
@@ -255,7 +253,7 @@ $conn->close();
                     <footer class="flex justify-end gap-2 mt-4">
                         <button type="button" class="btn-outline"
                             onclick="this.closest('dialog').close()">Cancel</button>
-                        <button type="submit" class="btn">Save changes</button>
+                        <button type="submit" class="btn bg-sky-500">Save changes</button>
                     </footer>
                 </form>
             </section>
@@ -273,13 +271,11 @@ $conn->close();
 
 
     <script>
-    // Changed function names to be specific to 'walkin'
     function openDeleteWalkinDialog(walkinId) {
         document.getElementById('deleteWalkinId').value = walkinId;
         document.getElementById('alert-dialog').showModal();
     }
 
-    // Changed function names and logic for fetching walkin data
     function openEditWalkinModal(walkinId) {
         fetch(`../actions/get_walkin.php?id=${walkinId}`)
             .then(response => {

@@ -218,6 +218,8 @@ $conn->close();
         const backButton = document.getElementById('backButton');
         const separator = '|||';
 
+        //when the row is selected this will show 
+
         table.querySelectorAll('tbody tr').forEach(row => {
             if (row.dataset.userName) {
                 row.addEventListener('click', () => {
@@ -414,6 +416,57 @@ $conn->close();
             document.getElementById('deleteCustomerId').value = customerId;
             document.getElementById('alert-dialog').showModal();
         }
+    </script>
+    <div id="toaster" class="toaster"></div>
+    <script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const url = new URL(window.location);
+        const params = url.searchParams;
+        const toaster = document.getElementById("toaster");
+
+        // Clear params BEFORE triggering toast display
+        if (params.has("success") || params.has("error")) {
+            const successMsg = params.get("success");
+            const errorMsg = params.get("error");
+
+            // Replace URL immediately 
+            url.search = "";
+            window.history.replaceState({}, document.title, url.toString());
+
+            // Now show toast after clearing URL
+            setTimeout(() => {
+                if (successMsg) showToast("success", "Success", successMsg);
+                if (errorMsg) showToast("error", "Error", errorMsg);
+            }, 10);
+        }
+
+        function showToast(type, title, message) {
+            const toast = document.createElement("div");
+            toast.className = "toast";
+            toast.setAttribute("data-category", type);
+            toast.innerHTML = `
+          <div class="toast-content">
+            <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30"
+                viewBox="0 0 24 24" fill="none" 
+                stroke="${type === 'success' ? '#22c55e' : '#ef4444'}" 
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                ${type === "success"
+                ? `<circle cx="12" cy="12" r="10" />
+                    <path d="m9 12 2 2 4-4" />`
+                : `<circle cx="12" cy="12" r="10" />
+                    <line x1="15" y1="9" x2="9" y2="15" />
+                    <line x1="9" y1="9" x2="15" y2="15" />`}
+            </svg>
+            <section>
+                <h2>${title}</h2>
+                <p>${message}</p>
+            </section>
+            </div>
+        `;
+            toaster.appendChild(toast);
+            setTimeout(() => toast.remove(), 4000);
+        }
+    });
     </script>
 </body>
 </html>

@@ -61,7 +61,6 @@ $conn->close();
                         <th>ID</th>
                         <th>Service Name</th>
                         <th>Description</th>
-                        <th>Price</th>
                         <th class="text-right">Actions</th>
                     </tr>
                 </thead>
@@ -72,14 +71,13 @@ $conn->close();
                         <td class="font-medium"><?= htmlspecialchars($row['id']); ?></td>
                         <td><?= htmlspecialchars($row['name']); ?></td>
                         <td><?= htmlspecialchars($row['description']); ?></td>
-                        <td>₱<?= number_format($row['price'], 2); ?></td>
                         <td>
                             <div class="flex gap-2 w-full justify-end">
                                 <button class="btn-sm-outline py-0 text-xs"
                                     onclick="openEditModal(<?= htmlspecialchars($row['id']); ?>)">
                                     Edit
                                 </button>
-                                <button type="button" class="btn-sm-destructive py-0 text-xs"
+                                <button type="button" class="btn-sm bg-rose-500 py-0 text-xs"
                                     onclick="openDeleteDialog(<?= htmlspecialchars($row['id']); ?>)">
                                     Delete
                                 </button>
@@ -139,15 +137,11 @@ $conn->close();
                     <input type="hidden" name="action" value="add">
                     <div class="grid gap-3">
                         <label for="name">Service Name</label>
-                        <input type="text" value="" id="name" name="name" autofocus />
+                        <input type="text" value="" id="name" name="name" autofocus placeholder="Enter Service Name"/>
                     </div>
                     <div class="grid gap-3">
                         <label for="description">Description</label>
-                        <input type="text" value="" name="description" id="description" />
-                    </div>
-                    <div class="grid gap-3">
-                        <label for="price">Price</label>
-                        <input type="number" value="" name="price" id="price" />
+                        <input type="text" value="" name="description" id="description" placeholder="Enter Description"/>
                     </div>
                     <footer class="flex justify-end gap-2 mt-4">
                         <button class="btn-outline" onclick="this.closest('dialog').close()">Cancel</button>
@@ -189,11 +183,6 @@ $conn->close();
                         <label for="edit_description">Description</label>
                         <input type="text" name="description" id="edit_description" />
                     </div>
-                    <div class="grid gap-3">
-                        <label for="edit_price">Price</label>
-                        <input type="number" name="price" id="edit_price" />
-                    </div>
-
                     <footer class="flex justify-end gap-2 mt-4">
                         <button type="button" class="btn-outline"
                             onclick="this.closest('dialog').close()">Cancel</button>
@@ -235,7 +224,6 @@ $conn->close();
                 document.getElementById('edit_service_id').value = data.id;
                 document.getElementById('edit_name').value = data.name;
                 document.getElementById('edit_description').value = data.description || '';
-                document.getElementById('edit_price').value = data.price;
 
                 // Show the modal
                 document.getElementById('edit-service').showModal();

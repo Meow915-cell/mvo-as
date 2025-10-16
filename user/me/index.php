@@ -81,21 +81,32 @@ $conn->close();
                         </div>
 
                         <div class="flex-1 gap-8 flex flex-col">
-                        <?php if (!empty($user['phone'])): ?>
-                        <div>
-                            <p class="text-sm text-muted-foreground">Phone</p>
-                            <p class="font-medium"><?php echo htmlspecialchars($user['phone']); ?></p>
-                        </div>
-                        <?php endif; ?>
+                            <?php if (!empty($user['phone'])): ?>
+                            <div>
+                                <p class="text-sm text-muted-foreground">Phone</p>
+                                <p class="font-medium"><?php echo htmlspecialchars($user['phone']); ?></p>
+                            </div>
+                            <?php endif; ?>
 
-                        <?php if (!empty($user['address'])): ?>
-                        <div>
-                            <p class="text-sm text-muted-foreground">Address</p>
-                            <p class="font-medium"><?php echo htmlspecialchars($user['address']); ?></p>
-                        </div>
-                        <?php endif; ?>
+                            <?php if (!empty($user['address'])): ?>
+                            <div>
+                                <p class="text-sm text-muted-foreground">Address</p>
+                                <p class="font-medium"><?php echo htmlspecialchars($user['address']); ?></p>
+                            </div>
+                            <?php endif; ?>
                         </div>
                     </div>
+                    <div class="mt-6 flex justify-end gap-4">
+                        <button class="btn-sm-outline" onclick="openModal('editProfileModal')" id="editProfileBtn">Edit
+                            Profile</button>
+                        <button class="btn-sm-outline" onclick="openModal('changePasswordModal')" id="changePasswordBtn">Change
+                            Password</button>
+                        <form action="../logout.php" method="POST">
+                            <button type="submit" class="btn-sm bg-rose-500" id="logoutBtn">Logout</button>
+                        </form>
+                    </div>
+
+
                 </div>
             </section>
 
@@ -133,6 +144,45 @@ $conn->close();
 
                     </div>
                     <?php endif; ?>
+
+
+                    <div class="card w-xs">
+  <header>
+    <h2>Ming ming</h2>
+    <p>Other • 16Year old</p>
+  </header>
+  <section class="px-0">
+    <img
+      alt="Photo by Drew Beamer"
+      loading="lazy"
+      width="500"
+      height="500"
+      class="aspect-video object-cover" style="color:transparent"
+      srcset="
+        https://images.unsplash.com/photo-1588345921523-c2dcdb7f1dcd?w=800&dpr=2&q=80&w=640&q=75 1x,
+        https://images.unsplash.com/photo-1588345921523-c2dcdb7f1dcd?w=800&dpr=2&q=80&w=1080&q=75 2x
+      "
+      src="https://images.unsplash.com/photo-1588345921523-c2dcdb7f1dcd?w=800&dpr=2&q=80&w=1080&q=75"
+    />
+  </section>
+  <footer class="flex items-center gap-2">
+    <span class="badge-outline">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4v16" /><path d="M2 8h18a2 2 0 0 1 2 2v10" /><path d="M2 17h20" /><path d="M6 8v9" /></svg>
+      1
+    </span>
+    <span class="badge-outline">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 4 8 6" /><path d="M17 19v2" /><path d="M2 12h20" /><path d="M7 19v2" /><path d="M9 5 7.621 3.621A2.121 2.121 0 0 0 4 5v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5" /></svg>
+      2
+    </span>
+    <span class="badge-outline">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 8 6-3-6-3v10" /><path d="m8 11.99-5.5 3.14a1 1 0 0 0 0 1.74l8.5 4.86a2 2 0 0 0 2 0l8.5-4.86a1 1 0 0 0 0-1.74L16 12" /><path d="m6.49 12.85 11.02 6.3" /><path d="M17.51 12.85 6.5 19.15" /></svg>
+      350m²
+    </span>
+    <span class="ml-auto font-medium tabular-nums">
+      $135,000
+    </span>
+  </footer>
+</div>
                 </div>
             </section>
         </div>
