@@ -14,7 +14,7 @@ $module = 'services';
 $access = restrictAccess($conn, $_SESSION['user_id'], $module);
 
 // Fetch all services
-$stmt = $conn->prepare("SELECT id, name, description, price FROM services ORDER BY id DESC");
+$stmt = $conn->prepare("SELECT id, name, description FROM services ORDER BY id DESC");
 $stmt->execute();
 $services = $stmt->get_result();
 $stmt->close();
