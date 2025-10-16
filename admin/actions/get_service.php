@@ -3,7 +3,7 @@ require_once '../../db/db_connect.php';
 
 if (isset($_GET['id'])) {
     $id = intval($_GET['id']);
-    $stmt = $conn->prepare("SELECT id, name, description, price FROM services WHERE id = ?");
+    $stmt = $conn->prepare("SELECT id, name, description FROM services WHERE id = ?");
     $stmt->bind_param("i", $id);
     $stmt->execute();
     $result = $stmt->get_result();

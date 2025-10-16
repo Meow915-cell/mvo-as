@@ -13,7 +13,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     if ($action === 'add') {
         $name = trim($_POST['name']);
         $description = trim($_POST['description']);
-        $price = floatval($_POST['price']);
 
         if (empty($name) || $price < 0) {
             header("Location: ../services/index.php?error=Invalid input data");
@@ -32,15 +31,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         $service_id = intval($_POST['service_id']);
         $name = trim($_POST['name']);
         $description = trim($_POST['description']);
-        $price = floatval($_POST['price']);
 
-        if (empty($name) || $price < 0) {
-            header("Location: ../services/index.php?error=Invalid input data");
-            exit();
-        }
-
-        $stmt = $conn->prepare("UPDATE services SET name = ?, description = ?, price = ? WHERE id = ?");
-        $stmt->bind_param("ssdi", $name, $description, $price, $service_id);
+        $stmt = $conn->prepare("UPDATE services SET name = ?, description = ? WHERE id = ?");
+        $stmt->bind_param("ssdi", $name, $description, $service_id);
         if ($stmt->execute()) {
             header("Location: ../services/index.php?success=Service updated successfully");
         } else {
