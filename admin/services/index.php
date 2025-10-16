@@ -5,7 +5,7 @@ require_once '../restrict_access.php';
 
 // Redirect if user_id is not set
 if (!isset($_SESSION['user_id'])) {
-    header("Location: ../login.php");
+    header("Location: ../../login.php");
     exit();
 }
 
@@ -49,7 +49,7 @@ $conn->close();
                     <a class="text-lg font-medium hover:text-foreground transition-colors">Services</a>
                 </li>
             </ol>
-            <button class="btn-sm" onclick="document.getElementById('add-service').showModal()">Add
+            <button class="btn-sm bg-sky-500" onclick="document.getElementById('add-service').showModal()">Add
                 Service</button>
         </div>
 
@@ -117,7 +117,7 @@ $conn->close();
                 <footer class="flex justify-end gap-2 mt-4">
                     <button type="button" class="btn-outline"
                         onclick="document.getElementById('alert-dialog').close()">Cancel</button>
-                    <button type="submit" class="btn-primary">Continue</button>
+                    <button type="submit" class="btn-destructive">Continue</button>
                 </footer>
             </form>
         </article>
@@ -151,7 +151,7 @@ $conn->close();
                     </div>
                     <footer class="flex justify-end gap-2 mt-4">
                         <button class="btn-outline" onclick="this.closest('dialog').close()">Cancel</button>
-                        <button type="submit" class="btn" onclick="this.closest('dialog').close()">Save changes</button>
+                        <button type="submit" class="btn bg-sky-500" onclick="this.closest('dialog').close()">Save changes</button>
                     </footer>
                 </form>
             </section>
@@ -197,7 +197,7 @@ $conn->close();
                     <footer class="flex justify-end gap-2 mt-4">
                         <button type="button" class="btn-outline"
                             onclick="this.closest('dialog').close()">Cancel</button>
-                        <button type="submit" class="btn">Save changes</button>
+                        <button type="submit" class="btn bg-sky-500">Save changes</button>
                     </footer>
                 </form>
             </section>

@@ -9,20 +9,35 @@ aside nav a,
 aside nav summary {
     user-select: none;
 }
+
+
+.sidebar nav>section ul li>details>summary:after {
+    background-color: white !important;
+}
+.sidebar nav>section ul li>details>summary:hover::after {
+    background-color: black !important;
+}
+
+:is(.sidebar nav>section ul li>a,.sidebar nav>section ul li>details>summary)[aria-current=page] {
+    /* when the nav link is selected */
+}
+
+
+
 </style>
 
 <aside class="sidebar " data-side="left" aria-hidden="false" >
     <nav aria-label="Sidebar navigation ">
         <section class="scrollbar bg-sky-600 text-white">
-            <div class="rounded-sm m-2 flex gap-2 items-center" style="width: calc(100% - 1rem)">
-                <img class="size-12 object-cover rounded-full" alt="logo" src="../../logo.png" />
-                <h2 class="font-semibold text-sm">Municipality Vetrinary Office</h2>
+            <div class="rounded-sm m-2 flex gap-2 items-center mt-4" style="width: calc(100% - 1rem)">
+                <img class="size-12 object-cover rounded-full bg-white p-0" alt="logo" src="../../logo.png" />
+                <h2 class="font-semibold text-md">Municipality Veterinary Office</h2>
                 <p>
 
             </div>
             <div role="group" aria-labelledby="group-label-content-1" class="mt-0">
-                <h3 id="group-label-content-1">Main</h3>
-                <ul>
+                <h3 id="group-label-content-1" class="!text-white/60">Main</h3>
+                <ul >
                     <li >
                         <a href="../dashboard" class="hover:!bg-sky-200/50 ">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
@@ -40,7 +55,7 @@ aside nav summary {
 
                     <li>
                         <details id="submenu-content-1-3" href="appointments" <?php if(basename(dirname($_SERVER['PHP_SELF'])) == 'appointments'){ echo 'open'; } ?>>
-                            <summary aria-controls="submenu-content-1-3-content" class="hover:!bg-sky-200/50">
+                            <summary aria-controls="submenu-content-1-3-content" class="hover:!bg-sky-200/50 ">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                     stroke-linejoin="round" class="lucide lucide-calendar1-icon lucide-calendar-1">
@@ -53,7 +68,7 @@ aside nav summary {
                                 Appointments
 
                             </summary>
-                            <ul id="submenu-content-1-3-content">
+                            <ul id="submenu-content-1-3-content" >
                                 <li >
                                     <a href="../appointments" class="hover:!bg-sky-200/50">
                                         <span>All</span>
@@ -92,7 +107,7 @@ aside nav summary {
                             <span>Walk-in</span>
                         </a>
                     </li>
-                    <h3 id="group-label-content-1">Management</h3>
+                    <h3 id="group-label-content-1" class="!text-white/60">Management</h3>
                     <li>
                         <a href="../services" class="hover:!bg-sky-200/50">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
@@ -158,7 +173,7 @@ aside nav summary {
                             <span>Drugs</span>
                         </a>
                     </li>
-                    <h3 id="group-label-content-1">Others</h3>
+                    <h3 id="group-label-content-1" class="!text-white/60">Others</h3>
                     <li>
                         <a href="../users" class="hover:!bg-sky-200/50">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"

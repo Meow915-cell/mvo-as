@@ -165,9 +165,10 @@ $conn->close();
     <dialog id="restrictedDateModal" class="dialog w-full sm:max-w-lg" 
         onclick="if (event.target === this) this.close()">
         <article>
-            <header>
-                <h2 id="modalTitle">Add Restricted Date</h2>
-                <button type="button" aria-label="Close dialog" onclick="closeModal()">
+            <header >
+                <div class="flex justify-between">
+                    <h2 id="modalTitle">Add Restricted Date</h2>
+                <button class="w-max" type="button" aria-label="Close dialog" onclick="closeModal()">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                         class="lucide lucide-x-icon lucide-x">
@@ -175,6 +176,8 @@ $conn->close();
                         <path d="m6 6 12 12" />
                     </svg>
                 </button>
+                </div>
+                
             </header>
 
             <section>

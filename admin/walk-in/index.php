@@ -10,7 +10,6 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 // Check access for a suitable module, or change the logic if needed
-// Keeping 'services' for now, but in a real app, this should be a 'walkin' or 'patients' module
 $module = 'services';
 $access = restrictAccess($conn, $_SESSION['user_id'], $module);
 
@@ -27,7 +26,7 @@ $stmt = $conn->prepare("SELECT
     FROM walkin 
     ORDER BY id DESC");
 $stmt->execute();
-$walkins = $stmt->get_result(); // Changed variable name to 'walkins'
+$walkins = $stmt->get_result();
 $stmt->close();
 
 $conn->close();
@@ -62,8 +61,7 @@ $conn->close();
                     <a class="text-lg font-medium hover:text-foreground transition-colors">Walk-in Records</a>
                 </li>
             </ol>
-            <!-- Changed button for adding a walk-in record -->
-            <button class="btn-sm" onclick="document.getElementById('add-walkin').showModal()">Add
+            <button class="btn-sm bg-sky-500" onclick="document.getElementById('add-walkin').showModal()">Add
                 Walk-in</button>
         </div>
 
@@ -100,12 +98,10 @@ $conn->close();
                         <td><?= htmlspecialchars(number_format($row['weight'], 2)); ?></td>
                         <td>
                             <div class="flex gap-2 w-full justify-end">
-                                <!-- Changed function call to match the new context -->
                                 <button class="btn-sm-outline py-0 text-xs"
                                     onclick="openEditWalkinModal(<?= htmlspecialchars($row['id']); ?>)">
                                     Edit
                                 </button>
-                                <!-- Changed function call to match the new context -->
                                 <button type="button" class="btn-sm-destructive py-0 text-xs"
                                     onclick="openDeleteWalkinDialog(<?= htmlspecialchars($row['id']); ?>)">
                                     Delete
@@ -137,7 +133,6 @@ $conn->close();
                 </p>
             </header>
 
-            <!-- Need to update this form action/inputs for walkin management -->
             <form id="deleteForm" action="../actions/manage_walkin.php" method="POST">
                 <input type="hidden" name="action" value="delete">
                 <input type="hidden" name="walkin_id" id="deleteWalkinId">
@@ -163,10 +158,8 @@ $conn->close();
             </header>
 
             <section class="overflow-y-auto">
-                 <!-- Need to update this form action/inputs for walkin management -->
                 <form class="form grid gap-4" action="../actions/manage_walkin.php" method="POST">
                     <input type="hidden" name="action" value="add">
-                    <!-- Example inputs for walkin table -->
                     <div class="grid gap-3">
                         <label for="owner_name">Owner Name</label>
                         <input type="text" id="owner_name" name="owner_name" autofocus required />
@@ -346,7 +339,7 @@ $conn->close();
             toast.className = "toast";
             toast.setAttribute("data-category", type);
             toast.innerHTML = `
-          <div class="toast-content">
+          <div class="toast-content border-sky-400">
             <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30"
                 viewBox="0 0 24 24" fill="none" 
                 stroke="${type === 'success' ? '#22c55e' : '#ef4444'}" 

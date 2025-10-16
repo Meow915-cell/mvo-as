@@ -61,7 +61,7 @@ $stmt->close();
 $conn->close();
 ?>
 <!DOCTYPE html>
-<html >
+<html>
 
 <head>
     <meta charset="UTF-8" />
@@ -96,8 +96,20 @@ $conn->close();
     .details-container.visible {
         display: block;
     }
+
     .fc .fc-list {
-  font-size: 14px; /* change globally for list */
+        font-size: 14px;
+    }
+
+    /* Change the header text color in list views */
+.fc-theme-standard .fc-list-day-cushion {
+  color: #1e3a8a !important; /* your preferred color */
+  font-weight: 600; /* optional: make it bolder */
+}
+
+/* Optionally, change the date background too */
+.fc-theme-standard .fc-list-day-cushion {
+  background-color: #f0f4ff; /* light blue background */
 }
 
     </style>
@@ -126,20 +138,20 @@ $conn->close();
             </ol>
             <div class="flex justify-between">
                 <div>
-                    <button onclick="calendar.prev();" class="btn-sm-icon-primary"><svg
+                    <button onclick="calendar.prev();" class="btn-sm-icon bg-sky-500"><svg
                             xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
                             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                             class="lucide lucide-chevron-left-icon lucide-chevron-left">
                             <path d="m15 18-6-6 6-6" />
                         </svg></button>
-                    <button onclick="calendar.next();" class="btn-sm-icon"><svg xmlns="http://www.w3.org/2000/svg"
-                            width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    <button onclick="calendar.next();" class="btn-sm-icon bg-sky-500"><svg
+                            xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                             class="lucide lucide-chevron-right-icon lucide-chevron-right">
                             <path d="m9 18 6-6-6-6" />
                         </svg> </button>
 
-                    <button onclick="calendar.today();" class="btn-sm">
+                    <button onclick="calendar.today();" class="btn-sm bg-sky-500">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
                             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                             class="lucide lucide-calendar-days-icon lucide-calendar-days">
@@ -170,7 +182,7 @@ $conn->close();
 
 </div> -->
 
-            <div id="calendar" class="rounded-md mt-3 pt-0 border overflow-hidden"></div>
+            <div id="calendar" class="rounded-md mt-3 pt-0 border overflow-hidden "></div>
 
         </div>
     </main>
@@ -200,7 +212,9 @@ $conn->close();
             events: <?php echo json_encode($appointments); ?>,
             datesSet: function(info) {
                 updateDateRangeLabel(info.start, info.end);
+                updateTodayButtonState();
             },
+
             eventClick: function(info) {
                 const event = info.event;
                 const props = event.extendedProps;
@@ -233,7 +247,7 @@ $conn->close();
                             <div style="flex:1; min-width: 250px; border-right:1px solid #ddd; padding-right:20px;">
                                 <img src="../../uploads/${props.pet_image}" alt="Pet Image" class="pet-image">
                                 <div style="border-top:1px solid #ddd; padding-top:10px; margin-top:10px;"><strong>Appointment ID:</strong> ${props.appointment_id}</div>
-                                <div style="border-top:1px solid #ddd; padding-top:10px; margin-top:10px;"><strong>User:</strong> ${props.user_name}</div>
+                                <div style="border-top:1px solid #ddd; padding-top:10px; margin-top:10px;"><strong>Owner:</strong> ${props.user_name}</div>
                                 <div style="border-top:1px solid #ddd; padding-top:10px; margin-top:10px;"><strong>Pet:</strong> ${props.pet_name}</div>
                                 <div style="border-top:1px solid #ddd; padding-top:10px; margin-top:10px;"><strong>Service:</strong> ${props.service_name}</div>
                                 <div style="border-top:1px solid #ddd; padding-top:10px; margin-top:10px;"><strong>Status:</strong> ${props.status}</div>
@@ -259,10 +273,11 @@ $conn->close();
             }
         });
         calendar.render();
+updateTodayButtonState();
         const defaultBtn = document.querySelector("[onclick*='listWeek']");
-if (defaultBtn) {
-    changeCalendarView('listWeek', defaultBtn);
-}
+        if (defaultBtn) {
+            changeCalendarView('listWeek', defaultBtn);
+        }
     });
 
     function updateStatus(appointment_id, action) {
@@ -300,22 +315,23 @@ if (defaultBtn) {
         calendarContainer.classList.add('hidden');
         detailsContainer.innerHTML = content;
         detailsContainer.classList.add('visible');
-        detailsContainer.classList.remove('details-container'); // Remove the base class that has display: none
+        detailsContainer.classList.remove('details-container');
     }
 
     function changeCalendarView(viewName, btn) {
         calendar.changeView(viewName);
 
-        // Reset all buttons to outline style
+        // Reset all buttons
         document.querySelectorAll('.view-btn').forEach(b => {
-            b.classList.remove('btn-sm');
+            b.classList.remove('btn-sm', 'bg-sky-500');
             b.classList.add('btn-sm-outline');
         });
 
-        // Set clicked button as active
+        // Activate clicked button
         btn.classList.remove('btn-sm-outline');
-        btn.classList.add('btn-sm');
+        btn.classList.add('btn-sm', 'bg-sky-500');
     }
+
 
 
 
@@ -336,6 +352,28 @@ if (defaultBtn) {
 
         }
     }
+
+    function updateTodayButtonState() {
+        const todayBtn = document.querySelector("button[onclick='calendar.today();']");
+        if (!calendar || !todayBtn) return;
+
+        // Get today's date and the currently viewed range
+        const today = new Date();
+        const viewStart = calendar.view.currentStart;
+        const viewEnd = calendar.view.currentEnd;
+
+        // Check if today's date falls within the current view
+        const isTodayVisible = today >= viewStart && today < viewEnd;
+
+        if (isTodayVisible) {
+            todayBtn.classList.remove('btn-sm-outline');
+            todayBtn.classList.add('btn-sm', 'bg-sky-500');
+        } else {
+            todayBtn.classList.remove('btn-sm', 'bg-sky-500');
+            todayBtn.classList.add('btn-sm-outline');
+        }
+    }
+
 
     function updateDateRangeLabel(start, end) {
         const options = {
