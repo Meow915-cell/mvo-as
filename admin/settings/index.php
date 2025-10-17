@@ -77,16 +77,12 @@ if ($user_id === 1) {
                                     <td><?= htmlspecialchars($row['email']); ?></td>
                                     <td><?= htmlspecialchars($row['phone'] ?? '—'); ?></td>
                                     <td><?= htmlspecialchars($row['address'] ?? '—'); ?></td>
-                                    <?php if ($row['id'] != 1): ?>
                                     <td class="text-right flex gap-2 justify-end">
                                         <button class="btn-sm-outline text-xs"
                                             onclick="openPermissionDialog(<?= $row['id'] ?>)">Change Permission</button>
                                         <button class="btn-sm-outline text-xs text-red-500"
                                             onclick="confirmDelete(<?= $row['id'] ?>)">Delete</button>
-                                    </td>   
-                                    <?php else: ?>
-                                        <td class="text-right flex gap-2 justify-end">-</td>
-                                    <?php endif; ?>
+                                    </td>
                                 </tr>
                             <?php endforeach; ?>
                         <?php else: ?>

@@ -28,7 +28,7 @@ aside nav summary {
 
 <aside class="sidebar " data-side="left" aria-hidden="false" >
     <nav aria-label="Sidebar navigation ">
-        <section class="scrollbar bg-sky-600 text-white">
+        <section class="scrollbar bg-sky-700/87 text-white">
             <div class="rounded-sm m-2 flex gap-2 items-center mt-4" style="width: calc(100% - 1rem)">
                 <img class="size-12 object-cover rounded-full bg-white p-0" alt="logo" src="../../logo.png" />
                 <h2 class="font-semibold text-md">Municipality Veterinary Office</h2>
