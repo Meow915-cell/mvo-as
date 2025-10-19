@@ -2,15 +2,16 @@
 session_start();
 require_once '../../db/db_connect.php';
 
+header('Content-Type: application/json');
+
 if (!isset($_SESSION['user_id'])) {
-    header('Content-Type: application/json');
     echo json_encode(['error' => 'Unauthorized']);
     exit();
 }
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_GET['id'])) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'])) {
     $user_id = $_SESSION['user_id'];
-    $appointment_id = intval($_GET['id']);
+    $appointment_id = intval($_POST['id']);
 
     // Verify appointment belongs to user and is cancellable
     $stmt = $conn->prepare("SELECT status FROM appointments WHERE id = ? AND user_id = ? AND status IN ('pending', 'confirmed')");
@@ -19,7 +20,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_GET['id'])) {
     $result = $stmt->get_result();
 
     if ($result->num_rows === 0) {
-        header('Content-Type: application/json');
         echo json_encode(['error' => 'Appointment not found or cannot be cancelled']);
         $stmt->close();
         $conn->close();
@@ -32,10 +32,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_GET['id'])) {
     $stmt->bind_param("i", $appointment_id);
 
     if ($stmt->execute()) {
-        header('Content-Type: application/json');
         echo json_encode(['success' => true]);
     } else {
-        header('Content-Type: application/json');
         echo json_encode(['error' => 'Failed to cancel appointment']);
     }
     $stmt->close();

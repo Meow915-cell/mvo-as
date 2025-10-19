@@ -16,7 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Validate inputs
     if (empty($name) || empty($email)) {
-        header("Location: ../settings.php?error=Name and email are required");
+        header("Location: ../settings/?error=Name and email are required");
         exit();
     }
 
@@ -26,7 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt->execute();
     if ($stmt->get_result()->num_rows > 0) {
         $stmt->close();
-        header("Location: ../settings.php?error=Email already exists");
+        header("Location: ../settings/?error=Email already exists");
         exit();
     }
     $stmt->close();
@@ -35,13 +35,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt = $conn->prepare("UPDATE users SET name = ?, email = ?, phone = ?, address = ? WHERE id = ? AND role = 'admin'");
     $stmt->bind_param("ssssi", $name, $email, $phone, $address, $user_id);
     if ($stmt->execute()) {
-        header("Location: ../settings.php?success=Account information updated successfully");
+        header("Location: ../settings/?success=Account information updated successfully");
     } else {
-        header("Location: ../settings.php?error=Failed to update account information: " . urlencode($conn->error));
+        header("Location: ../settings/?error=Failed to update account information: " . urlencode($conn->error));
     }
     $stmt->close();
 } else {
-    header("Location: ../settings.php?error=Invalid request");
+    header("Location: ../settings/?error=Invalid request");
 }
 
 $conn->close();

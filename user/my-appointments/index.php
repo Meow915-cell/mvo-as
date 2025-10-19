@@ -18,7 +18,7 @@ while ($row = $result->fetch_assoc()) {
 $stmt->close();
 
 $all_services = [];
-$stmt = $conn->prepare("SELECT id, name, price FROM services");
+$stmt = $conn->prepare("SELECT id, name FROM services");
 $stmt->execute();
 $result = $stmt->get_result();
 while ($row = $result->fetch_assoc()) {
@@ -36,8 +36,7 @@ $stmt = $conn->prepare(
             a.status,
             p.name AS pet_name,
             p.image AS pet_image,
-            s.name AS service_name,
-            s.price AS service_price
+            s.name AS service_name
      FROM appointments a
      JOIN pets p ON a.pet_id = p.id
      JOIN services s ON a.service_id = s.id
@@ -181,7 +180,7 @@ $time_slots = [
 
                     <div class="grid gap-3">
                         <label for="create_pet_id">Pets</label>
-                        <select id="create_pet_id" name="pet_id" required class="w-[180px]">
+                        <select id="create_pet_id" name="pet_id" required class="w-full">
                             <option value="">Select a pet</option>
                             <?php foreach ($user_pets as $pet) : ?>
                                 <option value="<?= (int)$pet['id'] ?>"><?= htmlspecialchars($pet['name']) ?></option>
@@ -191,21 +190,21 @@ $time_slots = [
 
                     <div class="grid gap-3">
                         <label for="create_service_id">Service</label>
-                        <select id="create_service_id" name="service_id" required class="w-[180px]">
+                        <select id="create_service_id" name="service_id" required class="w-full">
                             <option value="">Select a service</option>
                             <?php foreach ($all_services as $service) : ?>
-                                <option value="<?= (int)$service['id'] ?>"><?= htmlspecialchars($service['name']) . ' - ₱' . htmlspecialchars($service['price']) ?></option>
+                                <option value="<?= (int)$service['id'] ?>"><?= htmlspecialchars($service['name']) ?></option>
                             <?php endforeach; ?>
                         </select>
                     </div>
 
-                    <div class="calendar-wrapper" id="create_calendar_wrapper">
-                        <label for="create_appointment_date">Date:</label>
-                        <input type="text" id="create_appointment_date" name="appointment_date" autocomplete="off" required>
+                    <div class="calendar-wrapper !w-full" id="create_calendar_wrapper">
+                        <label for="create_appointment_date" class="mb-3">Date:</label>
+                        <input class="!w-full" type="text" id="create_appointment_date" name="appointment_date" autocomplete="off" required>
                     </div>
 
                     <label for="create_appointment_time">Time:</label>
-                    <select id="create_appointment_time" name="appointment_time" required>
+                    <select class="w-full" id="create_appointment_time" name="appointment_time" required>
                         <option value="">Select a time</option>
                     </select>
 
@@ -249,7 +248,7 @@ $time_slots = [
                         <select id="reschedule_service_id" name="service_id" required class="w-[180px]">
                             <option value="">Select a service</option>
                             <?php foreach ($all_services as $service) : ?>
-                                <option value="<?= (int)$service['id'] ?>"><?= htmlspecialchars($service['name']) . ' - ₱' . htmlspecialchars($service['price']) ?></option>
+                                <option value="<?= (int)$service['id'] ?>"><?= htmlspecialchars($service['name']) ?></option>
                             <?php endforeach; ?>
                         </select>
                     </div>

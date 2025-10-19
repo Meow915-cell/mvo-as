@@ -7,6 +7,10 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     header("Location: ../../login.php");
     exit();
 }
+$statusFilter = '';
+if (isset($_GET['status'])) {
+    $statusFilter = $_GET['status'];
+}
 
 // Check access for appointments module
 $module = 'appointments';
@@ -22,14 +26,26 @@ $stmt->execute();
 $stmt->close();
 
 // Fetch appointments with pet image
-$stmt = $conn->prepare("SELECT a.id, a.appointment_date, a.appointment_time, a.reason, a.status, 
-                        u.name AS user_name, p.name AS pet_name, p.image AS pet_image, s.name AS service_name 
-                        FROM appointments a 
-                        JOIN users u ON a.user_id = u.id 
-                        JOIN pets p ON a.pet_id = p.id 
-                        JOIN services s ON a.service_id = s.id");
+$sql = "SELECT a.id, a.appointment_date, a.appointment_time, a.reason, a.status, 
+        u.name AS user_name, p.name AS pet_name, p.image AS pet_image, s.name AS service_name 
+        FROM appointments a 
+        JOIN users u ON a.user_id = u.id 
+        JOIN pets p ON a.pet_id = p.id 
+        JOIN services s ON a.service_id = s.id";
+
+if ($statusFilter) {
+    // Only show appointments with that status
+    $sql .= " WHERE a.status = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("s", $statusFilter);
+} else {
+    // Show everything (this is the "All" case)
+    $stmt = $conn->prepare($sql);
+}
+
 $stmt->execute();
 $result = $stmt->get_result();
+
 $appointments = [];
 while ($row = $result->fetch_assoc()) {
     $color = 'rgba(55, 136, 216, 0.7)';

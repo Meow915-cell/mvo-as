@@ -14,19 +14,21 @@ aside nav summary {
 .sidebar nav>section ul li>details>summary:after {
     background-color: white !important;
 }
+
 .sidebar nav>section ul li>details>summary:hover::after {
     background-color: black !important;
 }
 
-:is(.sidebar nav>section ul li>a,.sidebar nav>section ul li>details>summary)[aria-current=page] {
+:is(.sidebar nav>section ul li>a, .sidebar nav>section ul li>details>summary)[aria-current=page] {
     /* when the nav link is selected */
 }
-
-
-
 </style>
+<?php
+$currentModule = basename(dirname($_SERVER['PHP_SELF']));
+$currentStatus = ($currentModule === 'appointments') ? (isset($_GET['status']) ? $_GET['status'] : 'all') : null;
+?>
 
-<aside class="sidebar " data-side="left" aria-hidden="false" >
+<aside class="sidebar " data-side="left" aria-hidden="false">
     <nav aria-label="Sidebar navigation ">
         <section class="scrollbar bg-sky-700/87 text-white">
             <div class="rounded-sm m-2 flex gap-2 items-center mt-4" style="width: calc(100% - 1rem)">
@@ -37,8 +39,8 @@ aside nav summary {
             </div>
             <div role="group" aria-labelledby="group-label-content-1" class="mt-0">
                 <h3 id="group-label-content-1" class="!text-white/60">Main</h3>
-                <ul >
-                    <li >
+                <ul>
+                    <li>
                         <a href="../dashboard" class="hover:!bg-sky-200/50 ">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
@@ -54,7 +56,8 @@ aside nav summary {
                     </li>
 
                     <li>
-                        <details id="submenu-content-1-3" href="appointments" <?php if(basename(dirname($_SERVER['PHP_SELF'])) == 'appointments'){ echo 'open'; } ?>>
+                        <details id="submenu-content-1-3" href="appointments"
+                            <?php if(basename(dirname($_SERVER['PHP_SELF'])) == 'appointments'){ echo 'open'; } ?>>
                             <summary aria-controls="submenu-content-1-3-content" class="hover:!bg-sky-200/50 ">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
@@ -68,42 +71,55 @@ aside nav summary {
                                 Appointments
 
                             </summary>
-                            <ul id="submenu-content-1-3-content" >
-                                <li >
-                                    <a href="../appointments" class="hover:!bg-sky-200/50">
-                                        <span>All</span>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="appointments" class="hover:!bg-sky-200/50">
-                                        <span>Pending</span>
-                                    </a>
-                                </li>
+                     
+                                <ul id="submenu-content-1-3-content">
+    <li>
+        <a href="../appointments" class="hover:!bg-sky-200/50 <?= $currentStatus === 'all' ? '!bg-white' : '!bg-transparent !text-white' ?>">
+            <span>All</span>
+        </a>
+    </li>
+    <li>
+        <a href="../appointments/?status=pending" class="hover:!bg-sky-200/50 <?= $currentStatus === 'pending' ? '!bg-white' : '!bg-transparent !text-white' ?>">
+            <span>Pending</span>
+        </a>
+    </li>
+    <li>
+        <a href="../appointments/?status=accepted" class="hover:!bg-sky-200/50 <?= $currentStatus === 'accepted' ? '!bg-white' : '!bg-transparent !text-white' ?>">
+            <span>Accepted</span>
+        </a>
+    </li>
+    <li>
+        <a href="../appointments/?status=rejected" class="hover:!bg-sky-200/50 <?= $currentStatus === 'rejected' ? '!bg-white' : '!bg-transparent !text-white' ?>">
+            <span>Rejected</span>
+        </a>
+    </li>
+    <li>
+        <a href="../appointments/?status=completed" class="hover:!bg-sky-200/50 <?= $currentStatus === 'completed' ? '!bg-white' : '!bg-transparent !text-white' ?>">
+            <span>Completed</span>
+        </a>
+    </li>
+</ul>
 
-                                <li>
-                                    <a href="appointments" class="hover:!bg-sky-200/50">
-                                        <span>Accepted</span>
-                                    </a>
-                                </li>
 
-                                <li>
-                                    <a href="appointments" class="hover:!bg-sky-200/50">
-                                        <span>Rejected</span>
-                                    </a>
-                                </li>
-
-                                <li>
-                                    <a href="appointments" class="hover:!bg-sky-200/50">
-                                        <span>Complete</span>
-                                    </a>
-                                </li>
-                            </ul>
+                            
                         </details>
 
                     </li>
                     <li>
                         <a href="../walk-in" class="hover:!bg-sky-200/50">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-notebook-tabs-icon lucide-notebook-tabs"><path d="M2 6h4"/><path d="M2 10h4"/><path d="M2 14h4"/><path d="M2 18h4"/><rect width="16" height="20" x="4" y="2" rx="2"/><path d="M15 2v20"/><path d="M15 7h5"/><path d="M15 12h5"/><path d="M15 17h5"/></svg>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" class="lucide lucide-notebook-tabs-icon lucide-notebook-tabs">
+                                <path d="M2 6h4" />
+                                <path d="M2 10h4" />
+                                <path d="M2 14h4" />
+                                <path d="M2 18h4" />
+                                <rect width="16" height="20" x="4" y="2" rx="2" />
+                                <path d="M15 2v20" />
+                                <path d="M15 7h5" />
+                                <path d="M15 12h5" />
+                                <path d="M15 17h5" />
+                            </svg>
                             <span>Walk-in</span>
                         </a>
                     </li>
@@ -169,7 +185,12 @@ aside nav summary {
                     </li>
                     <li>
                         <a href="../drugs" class="hover:!bg-sky-200/50">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-pill-icon lucide-pill"><path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z"/><path d="m8.5 8.5 7 7"/></svg>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" class="lucide lucide-pill-icon lucide-pill">
+                                <path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z" />
+                                <path d="m8.5 8.5 7 7" />
+                            </svg>
                             <span>Drugs</span>
                         </a>
                     </li>

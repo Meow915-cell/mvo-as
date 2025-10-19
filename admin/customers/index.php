@@ -102,7 +102,7 @@ $conn->close();
                             <th>Phone</th>
                             <th>Address</th>
                             <th>Total Pets</th>
-                            <th>Email Verified</th>
+                            <!-- <th>Email Verified</th> -->
                         </tr>
                     </thead>
                     <tbody>
@@ -136,7 +136,7 @@ $conn->close();
                             <td><?= htmlspecialchars($row['phone']); ?></td>
                             <td><?= htmlspecialchars($row['address']); ?></td>
                             <td><?= $row['pet_ids'] ? count(explode('|||', $row['pet_ids'])) : 0; ?></td>
-                            <td>No</td>
+                            <!-- <td>No</td> -->
                         </tr>
                         <?php endwhile; ?>
                         <?php else: ?>

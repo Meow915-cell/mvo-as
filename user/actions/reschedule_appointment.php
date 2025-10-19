@@ -18,7 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     // Validate inputs
     if (empty($appointment_id) || empty($pet_id) || empty($service_id) || empty($appointment_date) || empty($appointment_time) || empty($reason)) {
-        header("Location: ../my-appointments.php?error=All fields are required");
+        header("Location: ../my-appointments/?error=All fields are required");
         exit();
     }
 
@@ -27,7 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $stmt->bind_param("ii", $appointment_id, $user_id);
     $stmt->execute();
     if ($stmt->get_result()->num_rows === 0) {
-        header("Location: ../my-appointments.php?error=Invalid appointment selected");
+        header("Location: ../my-appointments/?error=Invalid appointment selected");
         $stmt->close();
         exit();
     }
@@ -38,7 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $stmt->bind_param("ii", $pet_id, $user_id);
     $stmt->execute();
     if ($stmt->get_result()->num_rows === 0) {
-        header("Location: ../my-appointments.php?error=Invalid pet selected");
+        header("Location: ../my-appointments/?error=Invalid pet selected");
         $stmt->close();
         exit();
     }
@@ -49,7 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $stmt->bind_param("i", $service_id);
     $stmt->execute();
     if ($stmt->get_result()->num_rows === 0) {
-        header("Location: ../my-appointments.php?error=Invalid service selected");
+        header("Location: ../my-appointments/?error=Invalid service selected");
         $stmt->close();
         exit();
     }
@@ -65,7 +65,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $stmt->close();
 
     if ($is_sunday || $is_restricted) {
-        header("Location: ../my-appointments.php?error=Selected date is unavailable (Sundays or restricted dates)");
+        header("Location: ../my-appointments/?error=Selected date is unavailable (Sundays or restricted dates)");
         exit();
     }
 
@@ -74,9 +74,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $stmt->bind_param("iisssi", $pet_id, $service_id, $appointment_date, $appointment_time, $reason, $appointment_id);
 
     if ($stmt->execute()) {
-        header("Location: ../my-appointments.php?success=Appointment rescheduled successfully");
+        header("Location: ../my-appointments/?success=Appointment rescheduled successfully");
     } else {
-        header("Location: ../my-appointments.php?error=Failed to reschedule appointment");
+        header("Location: ../my-appointments/?error=Failed to reschedule appointment");
     }
     $stmt->close();
 }

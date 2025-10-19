@@ -13,7 +13,7 @@ aside nav summary {
 
 <aside class="sidebar " data-side="left" aria-hidden="false" >
     <nav aria-label="Sidebar navigation ">
-        <section class="scrollbar bg-sky-600 text-white">
+        <section class="scrollbar bg-sky-700/87 text-white">
             <div class="rounded-sm m-2 flex gap-2 items-center mt-4" style="width: calc(100% - 1rem)">
                 <img class="size-12 object-cover rounded-full bg-white p-0" alt="logo" src="../../logo.png" />
                 <h2 class="font-semibold text-md">Municipality Veterinary Office</h2>
@@ -24,7 +24,7 @@ aside nav summary {
                 <h3 id="group-label-content-1" class="!text-white/60">Main</h3>
                 <ul>
                     <li>
-                        <a href="../me" class="hover:!bg-sky-200/50 ">
+                        <a href="../me" class="hover:!bg-sky-200/50 !rounded-full border-transparent">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user-icon lucide-user"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
                             <span>My Account</span>
                         </a>
@@ -32,7 +32,7 @@ aside nav summary {
 
                     
                     <li>
-                        <a href="../my-appointments" class="hover:!bg-sky-200/50 ">
+                        <a href="../my-appointments" class="hover:!bg-sky-200/50 !rounded-full border-transparent">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                     stroke-linejoin="round" class="lucide lucide-calendar1-icon lucide-calendar-1">
@@ -46,13 +46,13 @@ aside nav summary {
                         </a>
                     </li>
                     <li>
-                        <a href="../appointment-history" class="hover:!bg-sky-200/50 ">
+                        <a href="../appointment-history" class="hover:!bg-sky-200/50 !rounded-full border-transparent">
                           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-history-icon lucide-history"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></svg>
                             <span>Appointment History</span>
                         </a>
                     </li>
                     <li>
-                        <a href="../pets" class="hover:!bg-sky-200/50 ">
+                        <a href="../pets" class="hover:!bg-sky-200/50 !rounded-full border-transparent">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-paw-print-icon lucide-paw-print"><circle cx="11" cy="4" r="2"/><circle cx="18" cy="8" r="2"/><circle cx="20" cy="16" r="2"/><path d="M9 10a5 5 0 0 1 5 5v3.5a3.5 3.5 0 0 1-6.84 1.045Q6.52 17.48 4.46 16.84A3.5 3.5 0 0 1 5.5 10Z"/></svg>
                             <span>Pets</span>
                         </a>
