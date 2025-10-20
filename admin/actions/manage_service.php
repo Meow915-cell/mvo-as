@@ -19,8 +19,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             exit();
         }
 
-        $stmt = $conn->prepare("INSERT INTO services (name, description, price) VALUES (?, ?, ?)");
-        $stmt->bind_param("ssd", $name, $description, $price);
+        $stmt = $conn->prepare("INSERT INTO services (name, description) VALUES (?, ?)");
+        $stmt->bind_param("ss", $name, $description);
         if ($stmt->execute()) {
             header("Location: ../services/index.php?success=Service added successfully");
         } else {
@@ -33,7 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         $description = trim($_POST['description']);
 
         $stmt = $conn->prepare("UPDATE services SET name = ?, description = ? WHERE id = ?");
-        $stmt->bind_param("ssdi", $name, $description, $service_id);
+        $stmt->bind_param("ssi", $name, $description, $service_id);
         if ($stmt->execute()) {
             header("Location: ../services/index.php?success=Service updated successfully");
         } else {
@@ -47,7 +47,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         if ($stmt->execute()) {
             header("Location: ../services/index.php?success=Service deleted successfully");
         } else {
-        header("Location: ../services/index.php?error=Cannot delete service while it is still linked to existing appointments.");
+            header("Location: ../services/index.php?error=Cannot delete service while it is still linked to existing appointments.");
         }
         $stmt->close();
     } else {
