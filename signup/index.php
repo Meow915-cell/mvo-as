@@ -3,41 +3,42 @@ session_start();
 require_once '../db/db_connect.php';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $name = trim($_POST['name']);
-    $email = trim($_POST['email']);
-    $password = password_hash(trim($_POST['password']), PASSWORD_DEFAULT);
-    $phone = trim($_POST['phone']);
-    $address = trim($_POST['address']);
-    $role = 'user'; // users sign up as regular users only
+  $name = trim($_POST['name']);
+  $email = trim($_POST['email']);
+  $password = password_hash(trim($_POST['password']), PASSWORD_DEFAULT);
+  $phone = trim($_POST['phone']);
+  $address = trim($_POST['address']);
+  $role = 'user'; // users sign up as regular users only
 
-    $stmt = $conn->prepare("SELECT id FROM users WHERE email = ?");
-    $stmt->bind_param("s", $email);
-    $stmt->execute();
-    if ($stmt->get_result()->num_rows > 0) {
-        header("Location: signup.php?error=Email already exists");
-        exit();
-    }
-    $stmt->close();
+  $stmt = $conn->prepare("SELECT id FROM users WHERE email = ?");
+  $stmt->bind_param("s", $email);
+  $stmt->execute();
+  if ($stmt->get_result()->num_rows > 0) {
+    header("Location: signup.php?error=Email already exists");
+    exit();
+  }
+  $stmt->close();
 
-    $stmt = $conn->prepare("INSERT INTO users (name, email, password, phone, address, role) VALUES (?, ?, ?, ?, ?, ?)");
-    $stmt->bind_param("ssssss", $name, $email, $password, $phone, $address, $role);
+  $stmt = $conn->prepare("INSERT INTO users (name, email, password, phone, address, role) VALUES (?, ?, ?, ?, ?, ?)");
+  $stmt->bind_param("ssssss", $name, $email, $password, $phone, $address, $role);
 
-    if ($stmt->execute()) {
-        $_SESSION['user_id'] = $stmt->insert_id;
-        $_SESSION['role'] = $role;
-        header("Location: ../user/me.php");
-        exit();
-    } else {
-        header("Location: signup.php?error=Signup failed");
-        exit();
-    }
-    $stmt->close();
+  if ($stmt->execute()) {
+    $_SESSION['user_id'] = $stmt->insert_id;
+    $_SESSION['role'] = $role;
+    header("Location: ../user/me.php");
+    exit();
+  } else {
+    header("Location: signup.php?error=Signup failed");
+    exit();
+  }
+  $stmt->close();
 }
 $conn->close();
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -56,6 +57,7 @@ $conn->close();
       display: flex;
       justify-content: center;
     }
+
     .cf-turnstile iframe {
       width: 100% !important;
       max-width: 100% !important;
@@ -69,14 +71,14 @@ $conn->close();
     <div class=" w-md max-w-lg">
       <header class="mb-8 flex justify-between items-center">
         <div>
-             <p class="text-xl font-bold mb-2">Create your account</p>
-            <p>Fill in your details to get started</p>
+          <p class="text-xl font-bold mb-2">Create your account</p>
+          <p>Fill in your details to get started</p>
         </div>
         <div>
-              <img class="size-18 object-cover rounded-full p-0" alt="logo" src="../logo.png" />
-</div>
-  
- 
+          <img class="size-18 object-cover rounded-full p-0" alt="logo" src="../logo.png" />
+        </div>
+
+
       </header>
 
       <section>
@@ -94,7 +96,7 @@ $conn->close();
           <div class="grid gap-2">
             <label for="email">Email</label>
             <input type="email" id="email" name="email" placeholder="you@example.com" required>
-                        <p class="text-muted-foreground text-sm">Used for account recovery and verification.</p>
+            <p class="text-muted-foreground text-sm">Used for account recovery and verification.</p>
           </div>
 
           <div class="grid gap-2">
@@ -110,16 +112,14 @@ $conn->close();
 
           <div class="grid gap-2">
             <label for="address">Address</label>
-            <textarea id="address" name="address" placeholder="123 Example St, Manila, Philippines" rows="2" required></textarea>
+            <textarea id="address" name="address" placeholder="123 Example St, Manila, Philippines" rows="2"
+              required></textarea>
           </div>
 
 
           <div class="turnstile-wrapper">
-            <div class="cf-turnstile"
-                 data-sitekey="0x4AAAAAAB6rcIV7pi2pB8QC"
-                 data-theme="light"
-                 data-size="flexible"
-                 data-callback="onSuccess" style="width: 100% !important">
+            <div class="cf-turnstile" data-sitekey="0x4AAAAAAB6rcIV7pi2pB8QC" data-theme="light" data-size="flexible"
+              data-callback="onSuccess" style="width: 100% !important">
             </div>
           </div>
 
@@ -128,23 +128,24 @@ $conn->close();
       </section>
 
       <footer class="flex flex-col items-center gap-2 mt-4">
-        <p class="text-center text-sm">Already have an account? 
+        <p class="text-center text-sm">Already have an account?
           <a href="../login" class="underline-offset-4 hover:underline">Login</a>
         </p>
       </footer>
     </div>
   </main>
-    <script>
-  // Disable the button initially
-  const loginButton = document.querySelector('button[type="submit"]');
-  loginButton.disabled = true;
-  loginButton.classList.add('opacity-50', 'cursor-not-allowed');
+  <script>
+    // Disable the button initially
+    const loginButton = document.querySelector('button[type="submit"]');
+    loginButton.disabled = true;
+    loginButton.classList.add('opacity-50', 'cursor-not-allowed');
 
-  // Cloudflare Turnstile callback
-  function onSuccess(token) {
-    loginButton.disabled = false;
-    loginButton.classList.remove('opacity-50', 'cursor-not-allowed');
-  }
-</script>
+    // Cloudflare Turnstile callback
+    function onSuccess(token) {
+      loginButton.disabled = false;
+      loginButton.classList.remove('opacity-50', 'cursor-not-allowed');
+    }
+  </script>
 </body>
+
 </html>

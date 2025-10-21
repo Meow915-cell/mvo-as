@@ -72,17 +72,17 @@ $conn->close();
 
                         <div class="flex-1 gap-8 flex flex-col">
                             <?php if (!empty($user['phone'])): ?>
-                            <div>
-                                <p class="text-sm text-muted-foreground">Phone</p>
-                                <p class="font-medium"><?php echo htmlspecialchars($user['phone']); ?></p>
-                            </div>
+                                <div>
+                                    <p class="text-sm text-muted-foreground">Phone</p>
+                                    <p class="font-medium"><?php echo htmlspecialchars($user['phone']); ?></p>
+                                </div>
                             <?php endif; ?>
 
                             <?php if (!empty($user['address'])): ?>
-                            <div>
-                                <p class="text-sm text-muted-foreground">Address</p>
-                                <p class="font-medium"><?php echo htmlspecialchars($user['address']); ?></p>
-                            </div>
+                                <div>
+                                    <p class="text-sm text-muted-foreground">Address</p>
+                                    <p class="font-medium"><?php echo htmlspecialchars($user['address']); ?></p>
+                                </div>
                             <?php endif; ?>
                         </div>
                     </div>
@@ -112,32 +112,32 @@ $conn->close();
                     </div>
 
                     <?php if ($pets->num_rows > 0): ?>
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        <?php while ($pet = $pets->fetch_assoc()): ?>
-                        <div class="card max-w-xs">
-                            <header>
-                                <h2><?php echo htmlspecialchars($pet['name']); ?></h2>
-                                <p><?php echo htmlspecialchars(($pet['type'] . ' - ' . $pet['breed'] ?? 'N/A') . ' • ' . $pet['age'] . ' years old'); ?>
-                                </p>
-                            </header>
-                            <section class="px-0">
-                                <img alt="<?php echo htmlspecialchars($pet['name']); ?>" loading="lazy" width="500"
-                                    height="500" class="aspect-video object-cover"
-                                    src="<?php echo $pet['image'] ? '../../uploads/' . htmlspecialchars($pet['image']) : 'https://placehold.co/300x200?text=' . htmlspecialchars($pet['type']); ?>" />
-                            </section>
-                            <footer class="flex items-center gap-2">
-                                <span class="badge-outline"><?php echo htmlspecialchars($pet['body_temp'] ?? 'N/A'); ?>
-                                    °C</span>
-                                <span class="badge-outline"><?php echo htmlspecialchars($pet['weight'] ?? 'N/A'); ?>
-                                    kg</span>
-                            </footer>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            <?php while ($pet = $pets->fetch_assoc()): ?>
+                                <div class="card max-w-xs">
+                                    <header>
+                                        <h2><?php echo htmlspecialchars($pet['name']); ?></h2>
+                                        <p><?php echo htmlspecialchars(($pet['type'] . ' - ' . $pet['breed'] ?? 'N/A') . ' • ' . $pet['age'] . ' years old'); ?>
+                                        </p>
+                                    </header>
+                                    <section class="px-0">
+                                        <img alt="<?php echo htmlspecialchars($pet['name']); ?>" loading="lazy" width="500"
+                                            height="500" class="aspect-video object-cover"
+                                            src="<?php echo $pet['image'] ? '../../uploads/' . htmlspecialchars($pet['image']) : 'https://placehold.co/300x200?text=' . htmlspecialchars($pet['type']); ?>" />
+                                    </section>
+                                    <footer class="flex items-center gap-2">
+                                        <span class="badge-outline"><?php echo htmlspecialchars($pet['body_temp'] ?? 'N/A'); ?>
+                                            °C</span>
+                                        <span class="badge-outline"><?php echo htmlspecialchars($pet['weight'] ?? 'N/A'); ?>
+                                            kg</span>
+                                    </footer>
+                                </div>
+                            <?php endwhile; ?>
                         </div>
-                        <?php endwhile; ?>
-                    </div>
                     <?php else: ?>
-                    <div class="text-center py-12">
-                        <p class="text-lg text-muted-foreground">You haven't added any pets yet.</p>
-                    </div>
+                        <div class="text-center py-12">
+                            <p class="text-lg text-muted-foreground">You haven't added any pets yet.</p>
+                        </div>
                     <?php endif; ?>
                 </div>
             </section>
@@ -242,34 +242,34 @@ $conn->close();
     </dialog>
 
     <!-- Logout Confirmation Dialog -->
-<dialog id="logoutDialog" class="dialog" aria-labelledby="logout-dialog-title"
-    aria-describedby="logout-dialog-description">
-    <article class="w-md">
-        <header>
-            <h2 id="logout-dialog-title">Are you sure you want to log out?</h2>
-            <p id="logout-dialog-description">
-                You’ll need to sign in again to access your account.
-            </p>
-        </header>
+    <dialog id="logoutDialog" class="dialog" aria-labelledby="logout-dialog-title"
+        aria-describedby="logout-dialog-description">
+        <article class="w-md">
+            <header>
+                <h2 id="logout-dialog-title">Are you sure you want to log out?</h2>
+                <p id="logout-dialog-description">
+                    You’ll need to sign in again to access your account.
+                </p>
+            </header>
 
-        <form action="../../logout.php" method="POST">
-            <footer class="flex justify-end gap-2 mt-4">
-                <button type="button" class="btn-outline"
-                    onclick="document.getElementById('logoutDialog').close()">Cancel</button>
-                <button type="submit" class="btn-destructive">Logout</button>
-            </footer>
-        </form>
-    </article>
-</dialog>
+            <form action="../../logout.php" method="POST">
+                <footer class="flex justify-end gap-2 mt-4">
+                    <button type="button" class="btn-outline"
+                        onclick="document.getElementById('logoutDialog').close()">Cancel</button>
+                    <button type="submit" class="btn-destructive">Logout</button>
+                </footer>
+            </form>
+        </article>
+    </dialog>
 
     <script>
-    function openModal(id) {
-        document.getElementById(id).showModal();
-    }
+        function openModal(id) {
+            document.getElementById(id).showModal();
+        }
 
-    function closeModal(id) {
-        document.getElementById(id).close();
-    }
+        function closeModal(id) {
+            document.getElementById(id).close();
+        }
     </script>
 </body>
 
