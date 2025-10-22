@@ -7,6 +7,7 @@ if (isset($_GET['id'])) {
     $stmt->bind_param("i", $vet_id);
     $stmt->execute();
     $result = $stmt->get_result();
+
     if ($vet = $result->fetch_assoc()) {
         header('Content-Type: application/json');
         echo json_encode($vet);
@@ -14,6 +15,7 @@ if (isset($_GET['id'])) {
         http_response_code(404);
         echo json_encode(['error' => 'Veterinarian not found']);
     }
+
     $stmt->close();
 } else {
     http_response_code(400);

@@ -48,7 +48,7 @@
                 <select name="role" hidden>
                     <option value="user" selected>User</option>
                 </select>
-                <button type="submit">Sign Up</button>
+                <button type="submit" name="signup_btn">Sign Up</button>
             </form>
         </div>
 
