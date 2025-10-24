@@ -1,7 +1,28 @@
+<?php
+session_start();
+require_once '../../db/db_connect.php';
 
+if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
+    header("Location: ../login.php");
+    exit();
+}
+
+// Fetch all drugs with latest IN and OUT info
+$query = "
+SELECT 
+    d.drug_id,
+    d.drug_name,
+    d.inventory,
+    (SELECT MAX(date_in) FROM drug_in WHERE drug_id = d.drug_id) AS last_in,
+    (SELECT MAX(date_out) FROM drug_out WHERE drug_id = d.drug_id) AS last_out
+FROM drugs d
+ORDER BY d.drug_id DESC
+";
+$drugs = $conn->query($query);
+?>
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
     <meta charset="UTF-8" />
@@ -9,180 +30,257 @@
     <link href="../../src/output.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/basecoat-css@0.3.2/dist/basecoat.cdn.min.css" />
     <script src="https://cdn.jsdelivr.net/npm/basecoat-css@0.3.2/dist/js/all.min.js" defer></script>
-    <script src="https://cdn.jsdelivr.net/npm/basecoat-css@0.3.2/dist/js/basecoat.min.js" defer></script>
-    <script src="https://cdn.jsdelivr.net/npm/basecoat-css@0.3.2/dist/js/sidebar.min.js" defer></script>
-
+    <title>Drug Inventory</title>
 </head>
 
 <body>
-
     <?php
     $current_page = basename($_SERVER['PHP_SELF']);
     include '../../components/sidebar.php';
     ?>
+
     <main class="p-4 md:p-6">
         <div class="flex justify-between">
-            <ol class="mb-4 text-muted-foreground flex flex-wrap items-center gap-1.5 text-sm break-words sm:gap-2.5">
-                <li class="inline-flex items-center gap-1.5 hover:cursor-pointer">
-                    <a class="text-lg font-medium hover:text-foreground transition-colors">Drugs</a>
-                </li>
-            </ol>
-            <button class="btn-sm bg-sky-500" onclick="document.getElementById('add-service').showModal()">Add
-                Drugs</button>
+            <h2 class="text-xl font-bold">Drugs Inventory</h2>
+            <div class="flex gap-2">
+                <button class="btn-sm bg-green-500" onclick="document.getElementById('add-drug').showModal()">Add Drug</button>
+                <button class="btn-sm bg-sky-500" onclick="document.getElementById('in-drug').showModal()">Stock In</button>
+            </div>
         </div>
 
         <div class="overflow-x-auto mt-4">
             <table class="table">
-                <caption>List of Available Drugs</caption>
+                <caption>List of Drugs</caption>
                 <thead>
                     <tr>
                         <th>ID</th>
-                        <th>Service Name</th>
-                        <th>Description</th>
-                        <th class="text-right">Actions</th>
+                        <th>Name</th>
+                        <th>Inventory</th>
+                        <th>Last Date In</th>
+                        <th>Last Date Out</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <?php if ($services->num_rows > 0): ?>
-                    <?php while ($row = $services->fetch_assoc()): ?>
-                    <tr>
-                        <td class="font-medium"><?= htmlspecialchars($row['id']); ?></td>
-                        <td><?= htmlspecialchars($row['name']); ?></td>
-                        <td><?= htmlspecialchars($row['description']); ?></td>
-                        <td>
-                            <div class="flex gap-2 w-full justify-end">
-                                <button class="btn-sm-outline py-0 text-xs"
-                                    onclick="openEditModal(<?= htmlspecialchars($row['id']); ?>)">
-                                    Edit
-                                </button>
-                                <button type="button" class="btn-sm-destructive py-0 text-xs"
-                                    onclick="openDeleteDialog(<?= htmlspecialchars($row['id']); ?>)">
-                                    Delete
-                                </button>
-
-                            </div>
-                        </td>
-                    </tr>
-                    <?php endwhile; ?>
+                    <?php if ($drugs->num_rows > 0): ?>
+                        <?php while ($row = $drugs->fetch_assoc()): ?>
+                            <tr>
+                                <td><?= htmlspecialchars($row['drug_id']); ?></td>
+                                <td><?= htmlspecialchars($row['drug_name']); ?></td>
+                                <td><?= htmlspecialchars($row['inventory']); ?></td>
+                                <td><?= htmlspecialchars($row['last_in'] ?? '—'); ?></td>
+                                <td><?= htmlspecialchars($row['last_out'] ?? '—'); ?></td>
+                                <td class="text-right flex gap-2 justify-end">
+                                    <button type="button" class="btn-sm-outline py-0 text-xs bg-blue-100"
+                                        onclick="openViewDialog(<?= $row['drug_id']; ?>)">View</button>
+                                    <button type="button" class="btn-sm-destructive py-0 text-xs"
+                                        onclick="openDeleteDialog(<?= $row['drug_id']; ?>)">Delete</button>
+                                </td>
+                            </tr>
+                        <?php endwhile; ?>
                     <?php else: ?>
-                    <tr>
-                        <td colspan="4" class="text-center">No services found</td>
-                    </tr>
+                        <tr><td colspan="6" class="text-center">No drugs found</td></tr>
                     <?php endif; ?>
                 </tbody>
             </table>
         </div>
     </main>
 
-    <!-- Delete Dialog -->
-
-    <dialog id="alert-dialog" class="dialog" aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description">
-        <article class="w-md">
-            <header>
-                <h2 id="alert-dialog-title">Are you absolutely sure?</h2>
-                <p id="alert-dialog-description">
-                    This action cannot be undone. This will permanently delete this service.
-                </p>
-            </header>
-
-            <form id="deleteForm" action="../actions/manage_service.php" method="POST">
-                <input type="hidden" name="action" value="delete">
-                <input type="hidden" name="service_id" id="deleteServiceId">
-
+    <!-- Add Drug Dialog -->
+    <dialog id="add-drug" class="dialog w-full sm:max-w-[425px]">
+        <article>
+            <header><h2>Add New Drug</h2></header>
+            <form class="form grid gap-4" action="../actions/manage_drug.php" method="POST">
+                <input type="hidden" name="action" value="add_drug">
+                <label>Drug Name <input type="text" name="drug_name" required></label>
                 <footer class="flex justify-end gap-2 mt-4">
-                    <button type="button" class="btn-outline"
-                        onclick="document.getElementById('alert-dialog').close()">Cancel</button>
-                    <button type="submit" class="btn-destructive">Continue</button>
+                    <button type="button" class="btn-outline" onclick="this.closest('dialog').close()">Cancel</button>
+                    <button type="submit" class="btn bg-green-500">Save</button>
                 </footer>
             </form>
         </article>
     </dialog>
 
-    <!-- Add Service Dialog -->
+    <!-- View Dialog -->
+    <dialog id="view-dialog" class="dialog w-full sm:max-w-[700px]">
+        <article>
+            <header><h2 class="font-bold">Drug Details</h2></header>
 
-    <dialog id="add-service" class="dialog w-full sm:max-w-[425px] max-h-[612px]"
-        onclick="if (event.target === this) this.close()">
-        <article class="w-md">
-            <header>
-                <h2>Add Service</h2>
-                <p>Enter the service details below. Click save when you're
-                    done.</p>
-            </header>
+            <div id="drug-info" class="mb-4 text-sm grid grid-cols-2 gap-2"></div>
 
-            <section>
-                <form class="form grid gap-4" action="../actions/manage_service.php" method="POST">
-                    <input type="hidden" name="action" value="add">
-                    <div class="grid gap-3">
-                        <label for="name">Service Name</label>
-                        <input type="text" value="" id="name" name="name" autofocus placeholder="Enter Service Name"/>
-                    </div>
-                    <div class="grid gap-3">
-                        <label for="description">Description</label>
-                        <input type="text" value="" name="description" id="description" placeholder="Enter Description"/>
-                    </div>
-                    <footer class="flex justify-end gap-2 mt-4">
-                        <button class="btn-outline" onclick="this.closest('dialog').close()">Cancel</button>
-                        <button type="submit" class="btn bg-sky-500" onclick="this.closest('dialog').close()">Save changes</button>
-                    </footer>
-                </form>
-            </section>
+            <table class="table w-full border mt-2">
+                <thead>
+                    <tr>
+                        <th>Date In</th>
+                        <th>Expiry</th>
+                        <th>Count</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="in-table-body">
+                    <tr><td colspan="4" class="text-center text-gray-500">Loading...</td></tr>
+                </tbody>
+            </table>
 
-            <button type="button" aria-label="Close dialog" onclick="this.closest('dialog').close()">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                    class="lucide lucide-x-icon lucide-x">
-                    <path d="M18 6 6 18" />
-                    <path d="m6 6 12 12" />
-                </svg>
-            </button>
+            <footer class="flex justify-end mt-4">
+                <button type="button" class="btn-outline" onclick="this.closest('dialog').close()">Close</button>
+            </footer>
         </article>
     </dialog>
 
-    <!-- Edit Service Dialog -->
-    <dialog id="edit-service" class="dialog w-full sm:max-w-[425px] max-h-[612px]"
-        onclick="if (event.target === this) this.close()">
-        <article class="w-md">
-            <header>
-                <h2>Edit Service</h2>
-                <p>Update the service details below. Click save when you're done.</p>
-            </header>
-
-            <section>
-                <form class="form grid gap-4" action="../actions/manage_service.php" method="POST">
-                    <input type="hidden" name="action" value="edit">
-                    <input type="hidden" name="service_id" id="edit_service_id">
-
-                    <div class="grid gap-3">
-                        <label for="edit_name">Service Name</label>
-                        <input type="text" name="name" id="edit_name" autofocus />
-                    </div>
-                    <div class="grid gap-3">
-                        <label for="edit_description">Description</label>
-                        <input type="text" name="description" id="edit_description" />
-                    </div>
-                    <footer class="flex justify-end gap-2 mt-4">
-                        <button type="button" class="btn-outline"
-                            onclick="this.closest('dialog').close()">Cancel</button>
-                        <button type="submit" class="btn bg-sky-500">Save changes</button>
-                    </footer>
-                </form>
-            </section>
-
-            <button type="button" aria-label="Close dialog" onclick="this.closest('dialog').close()">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                    class="lucide lucide-x-icon lucide-x">
-                    <path d="M18 6 6 18" />
-                    <path d="m6 6 12 12" />
-                </svg>
-            </button>
+    <!-- Stock In Dialog -->
+    <dialog id="in-drug" class="dialog w-full sm:max-w-[425px]">
+        <article>
+            <header><h2>Stock In</h2></header>
+            <form class="form grid gap-4" action="../actions/manage_drug.php" method="POST">
+                <input type="hidden" name="action" value="stock_in">
+                <label>Select Drug
+                    <select name="drug_id" required>
+                        <option value="">Select...</option>
+                        <?php
+                        $drugList = $conn->query("SELECT drug_id, drug_name FROM drugs ORDER BY drug_name ASC");
+                        while ($drug = $drugList->fetch_assoc()) {
+                            echo "<option value='{$drug['drug_id']}'>{$drug['drug_name']}</option>";
+                        }
+                        ?>
+                    </select>
+                </label>
+                <label>Quantity <input type="number" name="count_in" min="1" required></label>
+                <label>Expiry (optional) <input type="date" name="expiry"></label>
+                <footer class="flex justify-end gap-2 mt-4">
+                    <button type="button" class="btn-outline" onclick="this.closest('dialog').close()">Cancel</button>
+                    <button type="submit" class="btn bg-sky-500">Save</button>
+                </footer>
+            </form>
         </article>
     </dialog>
 
+    <!-- Stock Out Dialog -->
+    <dialog id="out-drug" class="dialog w-full sm:max-w-[425px]">
+        <article>
+            <header><h2>Stock Out</h2></header>
+            <form class="form grid gap-4" action="../actions/manage_drug.php" method="POST">
+                <input type="hidden" name="action" value="stock_out">
+                <input type="hidden" name="drug_id" id="out_drug_id">
+                <input type="hidden" name="current_stock" id="current_stock">
+                <label>Quantity Out <input type="number" name="count_out" id="qty_out" min="1" required></label>
+                <footer class="flex justify-end gap-2 mt-4">
+                    <button type="button" class="btn-outline" onclick="this.closest('dialog').close()">Cancel</button>
+                    <button type="submit" class="btn bg-sky-500">Confirm</button>
+                </footer>
+            </form>
+        </article>
+    </dialog>
 
-    
+    <!-- History Dialog -->
+<dialog id="history-dialog" class="dialog w-full sm:max-w-[600px]">
+  <article>
+    <header><h2 class="font-bold">Out History</h2></header>
 
+    <table class="table w-full border mt-2">
+      <thead>
+        <tr>
+          <th>Date Out</th>
+          <th>Quantity</th>
+        </tr>
+      </thead>
+      <tbody id="history-body">
+        <tr><td colspan="2" class="text-center text-gray-500">Loading...</td></tr>
+      </tbody>
+    </table>
+
+    <footer class="flex justify-end mt-4">
+      <button type="button" class="btn-outline" onclick="this.closest('dialog').close()">Close</button>
+    </footer>
+  </article>
+</dialog>
+
+
+    <!-- Delete Dialog -->
+    <dialog id="delete-dialog" class="dialog">
+        <article>
+            <h2>Confirm Delete</h2>
+            <p>Are you sure you want to delete this drug?</p>
+            <form action="../actions/manage_drug.php" method="POST">
+                <input type="hidden" name="action" value="delete_drug">
+                <input type="hidden" name="drug_id" id="delete_drug_id">
+                <footer class="flex justify-end gap-2 mt-4">
+                    <button type="button" class="btn-outline" onclick="this.closest('dialog').close()">Cancel</button>
+                    <button type="submit" class="btn-destructive">Delete</button>
+                </footer>
+            </form>
+        </article>
+    </dialog>
+
+    <script>
+        function openOutModal(id, stock) {
+            document.getElementById('out_drug_id').value = id;
+            document.getElementById('current_stock').value = stock;
+            document.getElementById('out-drug').showModal();
+        }
+
+        function openDeleteDialog(id) {
+            document.getElementById('delete_drug_id').value = id;
+            document.getElementById('delete-dialog').showModal();
+        }
+
+        function openViewDialog(id) {
+            fetch(`../actions/get_drug_info.php?drug_id=${id}`)
+                .then(response => response.json())
+                .then(data => {
+                    // Fill drug info
+                    document.getElementById('drug-info').innerHTML = `
+                        <p><strong>ID:</strong> ${data.drug_id}</p>
+                        <p><strong>Name:</strong> ${data.drug_name}</p>
+                        <p><strong>Inventory:</strong> ${data.inventory}</p>
+                        <p><strong>Last Date In:</strong> ${data.last_in ?? '—'}</p>
+                        <p><strong>Last Date Out:</strong> ${data.last_out ?? '—'}</p>
+                    `;
+
+                    // Fill drug_in table
+                    const tbody = document.getElementById('in-table-body');
+                    if (data.in_records.length > 0) {
+                        tbody.innerHTML = data.in_records.map(r => `
+                            <tr>
+                                <td>${r.date_in}</td>
+                                <td>${r.expiry ?? '—'}</td>
+                                <td>${r.count_in}</td>
+                                <td>
+                                    <button class="btn-sm-outline text-xs" onclick="openOutModal(${data.drug_id}, ${r.count_in})">Out</button>
+                                    <button class="btn-sm-outline text-xs" onclick="openHistory(${r.in_id})">History</button>
+                                </td>
+                            </tr>
+                        `).join('');
+                    } else {
+                        tbody.innerHTML = `<tr><td colspan="4" class="text-center text-gray-500">No IN records found</td></tr>`;
+                    }
+
+                    document.getElementById('view-dialog').showModal();
+                });
+        }
+
+        // Placeholder until history feature is added
+        function openHistory(drug_id) {
+  const tbody = document.getElementById('history-body');
+  tbody.innerHTML = `<tr><td colspan="2" class="text-center text-gray-500">Loading...</td></tr>`;
+
+  fetch(`../actions/get_history.php?drug_id=${drug_id}`)
+    .then(res => res.json())
+    .then(data => {
+      if (data.length > 0) {
+        tbody.innerHTML = data.map(row => `
+          <tr>
+            <td>${row.date_out}</td>
+            <td>${row.count_out}</td>
+          </tr>
+        `).join('');
+      } else {
+        tbody.innerHTML = `<tr><td colspan="2" class="text-center text-gray-500">No OUT history found</td></tr>`;
+      }
+      document.getElementById('history-dialog').showModal();
+    });
+}
+
+    </script>
 </body>
-
 </html>
