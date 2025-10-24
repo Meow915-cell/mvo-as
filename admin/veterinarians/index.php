@@ -96,7 +96,7 @@ $conn->close();
                                             onclick="openEditModal(<?= htmlspecialchars($row['id']); ?>)">
                                             Edit
                                         </button>
-                                        <button type="button" class="btn-sm py-0 text-xs bg-rose-500" 
+                                        <button type="button" class="btn-sm py-0 text-xs bg-rose-500"
                                             onclick="openDeleteDialog(<?= htmlspecialchars($row['id']); ?>)">
                                             Delete
                                         </button>
@@ -152,7 +152,8 @@ $conn->close();
             </header>
 
             <section>
-                <form class="form grid gap-4" action="../actions/manage_veterinarian.php" method="POST" enctype="multipart/form-data">
+                <form class="form grid gap-4" action="../actions/manage_veterinarian.php" method="POST"
+                    enctype="multipart/form-data">
                     <input type="hidden" name="action" value="add">
                     <div class="grid gap-3">
                         <label for="add_name">Name</label>
@@ -176,7 +177,8 @@ $conn->close();
                     </div>
 
                     <footer class="flex justify-end gap-2 mt-4">
-                        <button type="button" class="btn-outline" onclick="this.closest('dialog').close()">Cancel</button>
+                        <button type="button" class="btn-outline"
+                            onclick="this.closest('dialog').close()">Cancel</button>
                         <button type="submit" class="btn bg-sky-500">Save changes</button>
                     </footer>
                 </form>
@@ -203,7 +205,8 @@ $conn->close();
             </header>
 
             <section>
-                <form class="form grid gap-4" action="../actions/manage_veterinarian.php" method="POST" enctype="multipart/form-data">
+                <form class="form grid gap-4" action="../actions/manage_veterinarian.php" method="POST"
+                    enctype="multipart/form-data">
                     <input type="hidden" name="action" value="edit">
                     <input type="hidden" name="vet_id" id="edit_vet_id">
 

@@ -29,6 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 
         $stmt = $conn->prepare("UPDATE services SET name = ?, description = ? WHERE id = ?");
         $stmt->bind_param("ssi", $name, $description, $service_id);
+        $stmt->bind_param("ssi", $name, $description, $service_id);
         if ($stmt->execute()) {
             header("Location: ../services/?success=Service updated successfully");
         } else {

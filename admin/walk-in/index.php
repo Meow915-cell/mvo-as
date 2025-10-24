@@ -19,7 +19,7 @@ $stmt = $conn->prepare("SELECT
     owner_name, 
     pet_name, 
     type, 
-    age, 
+    birthdate, 
     breed, 
     body_temp, 
     weight 
@@ -44,7 +44,7 @@ $conn->close();
     <script src="https://cdn.jsdelivr.net/npm/basecoat-css@0.3.2/dist/js/all.min.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/basecoat-css@0.3.2/dist/js/basecoat.min.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/basecoat-css@0.3.2/dist/js/sidebar.min.js" defer></script>
-   
+
 </head>
 
 <body>
@@ -76,7 +76,7 @@ $conn->close();
                         <th>Owner Name</th>
                         <th>Pet Name</th>
                         <th>Type</th>
-                        <th>Age</th>
+                        <th>birthdate</th>
                         <th>Breed</th>
                         <th>Temp (C)</th>
                         <th>Weight (kg)</th>
@@ -86,35 +86,35 @@ $conn->close();
                 <tbody>
                     <!-- Looping through the walkin records -->
                     <?php if ($walkins->num_rows > 0): ?>
-                    <?php while ($row = $walkins->fetch_assoc()): ?>
-                    <tr>
-                        <td class="font-medium"><?= htmlspecialchars($row['id']); ?></td>
-                        <td><?= htmlspecialchars($row['owner_name']); ?></td>
-                        <td><?= htmlspecialchars($row['pet_name']); ?></td>
-                        <td><?= htmlspecialchars($row['type']); ?></td>
-                        <td><?= htmlspecialchars($row['age']); ?></td>
-                        <td><?= htmlspecialchars($row['breed']); ?></td>
-                        <td><?= htmlspecialchars(number_format($row['body_temp'], 2)); ?></td>
-                        <td><?= htmlspecialchars(number_format($row['weight'], 2)); ?></td>
-                        <td>
-                            <div class="flex gap-2 w-full justify-end">
-                                <button class="btn-sm-outline py-0 text-xs"
-                                    onclick="openEditWalkinModal(<?= htmlspecialchars($row['id']); ?>)">
-                                    Edit
-                                </button>
-                                <button type="button" class="btn-sm bg-rose-500 py-0 text-xs"
-                                    onclick="openDeleteWalkinDialog(<?= htmlspecialchars($row['id']); ?>)">
-                                    Delete
-                                </button>
+                        <?php while ($row = $walkins->fetch_assoc()): ?>
+                            <tr>
+                                <td class="font-medium"><?= htmlspecialchars($row['id']); ?></td>
+                                <td><?= htmlspecialchars($row['owner_name']); ?></td>
+                                <td><?= htmlspecialchars($row['pet_name']); ?></td>
+                                <td><?= htmlspecialchars($row['type']); ?></td>
+                                <td><?= htmlspecialchars($row['birthdate']); ?></td>
+                                <td><?= htmlspecialchars($row['breed']); ?></td>
+                                <td><?= htmlspecialchars(number_format($row['body_temp'], 2)); ?></td>
+                                <td><?= htmlspecialchars(number_format($row['weight'], 2)); ?></td>
+                                <td>
+                                    <div class="flex gap-2 w-full justify-end">
+                                        <button class="btn-sm-outline py-0 text-xs"
+                                            onclick="openEditWalkinModal(<?= htmlspecialchars($row['id']); ?>)">
+                                            Edit
+                                        </button>
+                                        <button type="button" class="btn-sm bg-rose-500 py-0 text-xs"
+                                            onclick="openDeleteWalkinDialog(<?= htmlspecialchars($row['id']); ?>)">
+                                            Delete
+                                        </button>
 
-                            </div>
-                        </td>
-                    </tr>
-                    <?php endwhile; ?>
+                                    </div>
+                                </td>
+                            </tr>
+                        <?php endwhile; ?>
                     <?php else: ?>
-                    <tr>
-                        <td colspan="9" class="text-center">No walk-in records found</td>
-                    </tr>
+                        <tr>
+                            <td colspan="9" class="text-center">No walk-in records found</td>
+                        </tr>
                     <?php endif; ?>
                 </tbody>
             </table>
@@ -148,8 +148,7 @@ $conn->close();
 
     <!-- Add Walk-in Dialog -->
 
-    <dialog id="add-walkin" class="dialog w-full sm:max-w-[425px] "
-        onclick="if (event.target === this) this.close()">
+    <dialog id="add-walkin" class="dialog w-full sm:max-w-[425px] " onclick="if (event.target === this) this.close()">
         <article class="w-md  max-h-[85vh] ">
             <header>
                 <h2>Add Walk-in Record</h2>
@@ -172,25 +171,26 @@ $conn->close();
                         <label for="type">Pet Type</label>
                         <input type="text" name="type" id="type" />
                     </div>
-                     <div class="grid gap-3">
-                        <label for="age">Age</label>
-                        <input type="number" step="0.01" name="age" id="age" />
+                    <div class="grid gap-3">
+                        <label for="birthdate">Birthdate</label>
+                        <input type="date" name="birthdate" id="birthdate" />
                     </div>
-                     <div class="grid gap-3">
+                    <div class="grid gap-3">
                         <label for="breed">Breed</label>
                         <input type="text" name="breed" id="breed" />
                     </div>
-                     <div class="grid gap-3">
+                    <div class="grid gap-3">
                         <label for="body_temp">Body Temperature (C)</label>
                         <input type="number" step="0.01" name="body_temp" id="body_temp" />
                     </div>
-                     <div class="grid gap-3">
+                    <div class="grid gap-3">
                         <label for="weight">Weight (kg)</label>
                         <input type="number" step="0.01" name="weight" id="weight" />
                     </div>
-                    
+
                     <footer class="flex justify-end gap-2 mt-4">
-                        <button type="button" class="btn-outline" onclick="this.closest('dialog').close()">Cancel</button>
+                        <button type="button" class="btn-outline"
+                            onclick="this.closest('dialog').close()">Cancel</button>
                         <button type="submit" class="btn bg-sky-500">Save changes</button>
                     </footer>
                 </form>
@@ -233,19 +233,19 @@ $conn->close();
                         <label for="edit_type">Pet Type</label>
                         <input type="text" name="type" id="edit_type" />
                     </div>
-                     <div class="grid gap-3">
-                        <label for="edit_age">Age</label>
-                        <input type="number" step="0.01" name="age" id="edit_age" />
+                    <div class="grid gap-3">
+                        <label for="edit_birthdate">Birthdate</label>
+                        <input type="date" name="birthdate" id="edit_birthdate" />
                     </div>
-                     <div class="grid gap-3">
+                    <div class="grid gap-3">
                         <label for="edit_breed">Breed</label>
                         <input type="text" name="breed" id="edit_breed" />
                     </div>
-                     <div class="grid gap-3">
+                    <div class="grid gap-3">
                         <label for="edit_body_temp">Body Temperature (C)</label>
                         <input type="number" step="0.01" name="body_temp" id="edit_body_temp" />
                     </div>
-                     <div class="grid gap-3">
+                    <div class="grid gap-3">
                         <label for="edit_weight">Weight (kg)</label>
                         <input type="number" step="0.01" name="weight" id="edit_weight" />
                     </div>
@@ -271,79 +271,79 @@ $conn->close();
 
 
     <script>
-    function openDeleteWalkinDialog(walkinId) {
-        document.getElementById('deleteWalkinId').value = walkinId;
-        document.getElementById('alert-dialog').showModal();
-    }
-
-    function openEditWalkinModal(walkinId) {
-        fetch(`../actions/get_walkin.php?id=${walkinId}`)
-            .then(response => {
-                if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-                return response.json();
-            })
-            .then(data => {
-                if (data.error) {
-                    alert('Error: ' + data.error);
-                    return;
-                }
-                // Fill the fields
-                document.getElementById('edit_walkin_id').value = data.id;
-                document.getElementById('edit_owner_name').value = data.owner_name;
-                document.getElementById('edit_pet_name').value = data.pet_name;
-                document.getElementById('edit_type').value = data.type || '';
-                document.getElementById('edit_age').value = data.age;
-                document.getElementById('edit_breed').value = data.breed || '';
-                document.getElementById('edit_body_temp').value = data.body_temp;
-                document.getElementById('edit_weight').value = data.weight;
-
-
-                // Show the modal
-                document.getElementById('edit-walkin').showModal();
-            })
-            .catch(error => {
-                console.error('Fetch error:', error.message);
-                alert('Failed to load walk-in data. Please try again.');
-            });
-    }
-    </script>
-<div id="toaster" class="toaster"></div>
-    <script>
-    document.addEventListener("DOMContentLoaded", () => {
-        const url = new URL(window.location);
-        const params = url.searchParams;
-        const toaster = document.getElementById("toaster");
-
-        // Clear params BEFORE triggering toast display
-        if (params.has("success") || params.has("error")) {
-            const successMsg = params.get("success");
-            const errorMsg = params.get("error");
-
-            // Replace URL immediately 
-            url.search = "";
-            window.history.replaceState({}, document.title, url.toString());
-
-            // Now show toast after clearing URL
-            setTimeout(() => {
-                if (successMsg) showToast("success", "Success", successMsg);
-                if (errorMsg) showToast("error", "Error", errorMsg);
-            }, 10);
+        function openDeleteWalkinDialog(walkinId) {
+            document.getElementById('deleteWalkinId').value = walkinId;
+            document.getElementById('alert-dialog').showModal();
         }
 
-        function showToast(type, title, message) {
-            const toast = document.createElement("div");
-            toast.className = "toast";
-            toast.setAttribute("data-category", type);
-            toast.innerHTML = `
+        function openEditWalkinModal(walkinId) {
+            fetch(`../actions/get_walkin.php?id=${walkinId}`)
+                .then(response => {
+                    if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.error) {
+                        alert('Error: ' + data.error);
+                        return;
+                    }
+                    // Fill the fields
+                    document.getElementById('edit_walkin_id').value = data.id;
+                    document.getElementById('edit_owner_name').value = data.owner_name;
+                    document.getElementById('edit_pet_name').value = data.pet_name;
+                    document.getElementById('edit_type').value = data.type || '';
+                    document.getElementById('edit_birthdate').value = data.birthdate;
+                    document.getElementById('edit_breed').value = data.breed || '';
+                    document.getElementById('edit_body_temp').value = data.body_temp;
+                    document.getElementById('edit_weight').value = data.weight;
+
+
+                    // Show the modal
+                    document.getElementById('edit-walkin').showModal();
+                })
+                .catch(error => {
+                    console.error('Fetch error:', error.message);
+                    alert('Failed to load walk-in data. Please try again.');
+                });
+        }
+    </script>
+    <div id="toaster" class="toaster"></div>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const url = new URL(window.location);
+            const params = url.searchParams;
+            const toaster = document.getElementById("toaster");
+
+            // Clear params BEFORE triggering toast display
+            if (params.has("success") || params.has("error")) {
+                const successMsg = params.get("success");
+                const errorMsg = params.get("error");
+
+                // Replace URL immediately 
+                url.search = "";
+                window.history.replaceState({}, document.title, url.toString());
+
+                // Now show toast after clearing URL
+                setTimeout(() => {
+                    if (successMsg) showToast("success", "Success", successMsg);
+                    if (errorMsg) showToast("error", "Error", errorMsg);
+                }, 10);
+            }
+
+            function showToast(type, title, message) {
+                const toast = document.createElement("div");
+                toast.className = "toast";
+                toast.setAttribute("data-category", type);
+                toast.innerHTML = `
           <div class="toast-content border-sky-400">
             <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30"
                 viewBox="0 0 24 24" fill="none" 
                 stroke="${type === 'success' ? '#22c55e' : '#ef4444'}" 
                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 ${type === "success"
-                ? `<circle cx="12" cy="12" r="10" />
+                        ? `<circle cx="12" cy="12" r="10" />
                     <path d="m9 12 2 2 4-4" />`
-                : `<circle cx="12" cy="12" r="10" />
+                        : `<circle cx="12" cy="12" r="10" />
                     <line x1="15" y1="9" x2="9" y2="15" />
                     <line x1="9" y1="9" x2="15" y2="15" />`}
             </svg>
@@ -353,10 +353,10 @@ $conn->close();
             </section>
             </div>
         `;
-            toaster.appendChild(toast);
-            setTimeout(() => toast.remove(), 4000);
-        }
-    });
+                toaster.appendChild(toast);
+                setTimeout(() => toast.remove(), 4000);
+            }
+        });
     </script>
 
 </body>
