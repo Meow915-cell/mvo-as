@@ -166,7 +166,6 @@ $stmt->close();
                         <label for="confirm_password">Confirm New Password</label>
                         <input type="password" id="confirm_password" name="confirm_password" required />
                     </div>
-
                     <footer class="flex justify-end gap-2 mt-4">
                         <button class="btn-outline" onclick="this.closest('dialog').close()"
                             type="button">Cancel</button>

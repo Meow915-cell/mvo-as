@@ -28,6 +28,7 @@ if ($user_id === 1) {
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -51,7 +52,8 @@ if ($user_id === 1) {
                     <a class="text-lg font-medium">Users</a>
                 </li>
             </ol>
-            <button class="btn-sm bg-sky-500" onclick="document.getElementById('add-user').showModal()">Add User</button>
+            <button class="btn-sm bg-sky-500" onclick="document.getElementById('add-user').showModal()">Add
+                User</button>
         </div>
 
         <section class="mt-6">
@@ -70,31 +72,31 @@ if ($user_id === 1) {
                     </thead>
                     <tbody>
                         <?php if (!empty($users)): ?>
-                            <?php foreach ($users as $row): ?>
-                                <tr>
-                                    <td><?= htmlspecialchars($row['id']); ?></td>
-                                    <td><?= htmlspecialchars($row['name']); ?></td>
-                                    <td><?= htmlspecialchars($row['email']); ?></td>
-                                    <td><?= htmlspecialchars($row['phone'] ?? '—'); ?></td>
-                                    <td><?= htmlspecialchars($row['address'] ?? '—'); ?></td>
-                                    <?php if ($row['id'] != 1): ?>
-                                    <td class="text-right flex gap-2 justify-end">
-                                        <button class="btn-sm-outline text-xs"
-                                            onclick="openPermissionDialog(<?= $row['id'] ?>)">Change Permission</button>
-                                        <button class="btn-sm-outline text-xs text-red-500"
-                                            onclick="confirmDelete(<?= $row['id'] ?>)">Delete</button>
-                                    </td>   
-                                    <?php else: ?>
-                                        <td class="text-right flex gap-2 justify-end">-</td>
-                                    <?php endif; ?>
-                                </tr>
-                            <?php endforeach; ?>
+                        <?php foreach ($users as $row): ?>
+                        <tr>
+                            <td><?= htmlspecialchars($row['id']); ?></td>
+                            <td><?= htmlspecialchars($row['name']); ?></td>
+                            <td><?= htmlspecialchars($row['email']); ?></td>
+                            <td><?= htmlspecialchars($row['phone'] ?? '—'); ?></td>
+                            <td><?= htmlspecialchars($row['address'] ?? '—'); ?></td>
+                            <?php if ($row['id'] != 1): ?>
+                            <td class="text-right flex gap-2 justify-end">
+                                <button class="btn-sm-outline text-xs"
+                                    onclick="openPermissionDialog(<?= $row['id'] ?>)">Change Permission</button>
+                                <button class="btn-sm-outline text-xs text-red-500"
+                                    onclick="confirmDelete(<?= $row['id'] ?>)">Delete</button>
+                            </td>
+                            <?php else: ?>
+                            <td class="text-right flex gap-2 justify-end">-</td>
+                            <?php endif; ?>
+                        </tr>
+                        <?php endforeach; ?>
                         <?php else: ?>
-                            <tr>
-                                <td colspan="7" class="text-center text-muted-foreground py-3">
-                                    No users found.
-                                </td>
-                            </tr>
+                        <tr>
+                            <td colspan="7" class="text-center text-muted-foreground py-3">
+                                No users found.
+                            </td>
+                        </tr>
                         <?php endif; ?>
                     </tbody>
                 </table>
@@ -113,7 +115,8 @@ if ($user_id === 1) {
             <form id="deleteForm" action="delete_user.php" method="GET">
                 <input type="hidden" name="user_id" id="deleteUserId">
                 <footer class="flex justify-end gap-2 mt-4">
-                    <button type="button" class="btn-outline" onclick="document.getElementById('alert-dialog').close()">Cancel</button>
+                    <button type="button" class="btn-outline"
+                        onclick="document.getElementById('alert-dialog').close()">Cancel</button>
                     <button type="submit" class="btn-primary">Delete</button>
                 </footer>
             </form>
@@ -148,8 +151,7 @@ if ($user_id === 1) {
                     <label for="address">Address</label>
                     <input type="text" id="address" name="address" />
                 </div>
-                             <input type="hidden" name="role" value="admin"/>
-
+                <input type="hidden" name="role" value="admin" />
 
                 <div>
                     <label for="confirm_password">Default Password</label>
@@ -171,12 +173,16 @@ if ($user_id === 1) {
                 <h2>Change Permissions</h2>
                 <p>Select the permissions for this user.</p>
             </header>
-            <form class="form grid gap-4" action="update_user_permission.php" method="POST">
+            <form class="form grid gap-4" action="../actions/update_user_permissions.php" method="POST">
                 <input type="hidden" name="user_id" id="permissionUserId">
 
-                <label><input type="checkbox" name="permissions[]" value="manage_users"> Manage Users</label>
+                <label><input type="checkbox" name="permissions[]" value="manage_appointments"> Manage Appointments</label>
+                <label><input type="checkbox" name="permissions[]" value="manage_walkin"> Manage Walk-in</label>
                 <label><input type="checkbox" name="permissions[]" value="manage_services"> Manage Services</label>
-                <label><input type="checkbox" name="permissions[]" value="view_reports"> View Reports</label>
+                <label><input type="checkbox" name="permissions[]" value="manage_customers"> Manage Customers</label>
+                <label><input type="checkbox" name="permissions[]" value="manage_veterinarians"> Manage Veterinarians</label>
+                <label><input type="checkbox" name="permissions[]" value="manage_schedules"> Manage Schedules</label>
+                <label><input type="checkbox" name="permissions[]" value="manage_drugs"> Manage Drugs</label>
 
                 <footer class="flex justify-end gap-2 mt-4">
                     <button type="button" class="btn-outline" onclick="this.closest('dialog').close()">Cancel</button>
@@ -187,15 +193,39 @@ if ($user_id === 1) {
     </dialog>
 
     <script>
+    // Delete confirmation
     function confirmDelete(id) {
         document.getElementById('deleteUserId').value = id;
         document.getElementById('alert-dialog').showModal();
     }
 
-    function openPermissionDialog(id) {
+    // Open permission dialog and pre-check existing permissions
+    async function openPermissionDialog(id) {
+        const dialog = document.getElementById('permission-dialog');
+        const checkboxes = dialog.querySelectorAll('input[name="permissions[]"]');
         document.getElementById('permissionUserId').value = id;
-        document.getElementById('permission-dialog').showModal();
+
+        // Uncheck all first
+        checkboxes.forEach(cb => cb.checked = false);
+
+        try {
+            // Fetch user permissions from DB
+            const response = await fetch(`../actions/get_user_permissions.php?user_id=${id}`);
+            const permissions = await response.json();
+
+            if (Array.isArray(permissions)) {
+                permissions.forEach(p => {
+                    const checkbox = dialog.querySelector(`input[value="${p}"]`);
+                    if (checkbox) checkbox.checked = true;
+                });
+            }
+        } catch (error) {
+            console.error('Failed to load permissions:', error);
+        }
+
+        dialog.showModal();
     }
     </script>
 </body>
+
 </html>

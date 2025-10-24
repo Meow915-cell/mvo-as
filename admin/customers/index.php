@@ -44,6 +44,35 @@ $stmt = $conn->prepare("
 $stmt->execute();
 $users = $stmt->get_result();
 
+// Fetch Services
+$all_services = [];
+$stmt_services = $conn->prepare("SELECT id, name FROM services");
+$stmt_services->execute();
+$result_services = $stmt_services->get_result();
+while ($row = $result_services->fetch_assoc()) {
+    $all_services[] = $row;
+}
+$stmt_services->close();
+
+// Fetch Restricted Dates/Times
+$restricted_dates = [];
+$stmt_restricted = $conn->prepare("SELECT restricted_date, start_time, end_time FROM restricted_dates");
+$stmt_restricted->execute();
+$restricted_dates_result = $stmt_restricted->get_result();
+while ($row = $restricted_dates_result->fetch_assoc()) {
+    $restricted_dates[] = [
+        'date' => $row['restricted_date'],
+        'start_time' => $row['start_time'],
+        'end_time' => $row['end_time']
+    ];
+}
+$stmt_restricted->close();
+
+$time_slots = [
+    '09:00:00', '10:00:00', '11:00:00', '12:00:00',
+    '13:00:00', '14:00:00', '15:00:00', '16:00:00'
+];
+
 $conn->close();
 ?>
 
@@ -57,9 +86,20 @@ $conn->close();
     <script src="https://cdn.jsdelivr.net/npm/basecoat-css@0.3.2/dist/js/all.min.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/basecoat-css@0.3.2/dist/js/basecoat.min.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/basecoat-css@0.3.2/dist/js/sidebar.min.js" defer></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <style>
         #usersTable table, #usersTable th, #usersTable td {
             user-select: none;
+        }
+        .flatpickr-calendar--dialog {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            z-index: 999;
+        }
+        .calendar-wrapper {
+            position: relative;
         }
     </style>
 </head>
@@ -150,7 +190,7 @@ $conn->close();
                     <ul class="flex flex-row items-center gap-1">
                         <li>
                             <a href="#" id="prevPage" class="btn-ghost">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                     <path d="m15 18-6-6 6-6" />
                                 </svg>
                                 Prev
@@ -160,7 +200,7 @@ $conn->close();
                         <li>
                             <a href="#" id="nextPage" class="btn-ghost">
                                 Next
-                                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                     <path d="m9 18 6-6-6-6" />
                                 </svg>
                             </a>
@@ -190,6 +230,60 @@ $conn->close();
             </ol>
             <div id="userDetailsContent"></div>
         </div>
+
+        <!-- Schedule Follow-Up Dialog -->
+        <dialog id="scheduleFollowUpDialog" class="dialog w-full sm:max-w-[425px] max-h-[612px]" onclick="if (event.target === this) this.close()">
+            <article class="w-md">
+                <header>
+                    <h2 id="scheduleFollowUpTitle">Schedule Follow-Up</h2>
+                    <p>Enter the follow-up appointment details below.</p>
+                </header>
+                <section>
+                    <form class="form grid gap-4" action="../actions/schedule_follow_up.php" method="POST" id="scheduleFollowUpForm">
+                        <input type="hidden" name="user_id" id="follow_up_user_id">
+                        <input type="hidden" name="action" value="schedule_follow_up">
+
+                        <div class="grid gap-3">
+                            <label for="follow_up_pet_id">Pet</label>
+                            <select id="follow_up_pet_id" name="pet_id" required class="w-full">
+                                <!-- Options will be populated by JavaScript -->
+                            </select>
+                        </div>
+
+                        <div class="grid gap-3">
+                            <label for="follow_up_service_id">Service</label>
+                            <select id="follow_up_service_id" name="service_id" required class="w-full">
+                                <option value="">Select a service</option>
+                                <?php foreach ($all_services as $service) : ?>
+                                    <option value="<?= (int)$service['id'] ?>"><?= htmlspecialchars($service['name']) ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+
+                        <div class="calendar-wrapper !w-full" id="follow_up_calendar_wrapper">
+                            <label for="follow_up_appointment_date" class="mb-3">Date:</label>
+                            <input class="!w-full" type="text" id="follow_up_appointment_date" name="appointment_date" autocomplete="off" required>
+                        </div>
+
+                        <label for="follow_up_appointment_time">Time:</label>
+                        <select class="w-full" id="follow_up_appointment_time" name="appointment_time" required>
+                            <option value="">Select a time</option>
+                        </select>
+
+                        <div class="grid gap-3">
+                            <label for="follow_up_reason">Reason</label>
+                            <input type="text" value="" id="follow_up_reason" name="reason" placeholder="Enter reason for follow-up" required />
+                        </div>
+
+                        <footer class="flex justify-end gap-2 mt-4">
+                            <button type="button" class="btn-outline" onclick="document.getElementById('scheduleFollowUpDialog').close()">Cancel</button>
+                            <button type="submit" class="btn bg-sky-500">Schedule</button>
+                        </footer>
+                    </form>
+                </section>
+            </article>
+        </dialog>
+        
         <dialog id="alert-dialog" class="dialog" aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
             <article class="w-md">
                 <header>
@@ -217,9 +311,145 @@ $conn->close();
         const detailsContent = document.getElementById('userDetailsContent');
         const backButton = document.getElementById('backButton');
         const separator = '|||';
+        const restrictedDates = <?php echo json_encode($restricted_dates); ?>;
+        const timeSlots = <?php echo json_encode($time_slots); ?>;
+        let followUpDatePicker = null;
+
+        // --- Flatpickr/Time Slot Logic ---
+        const formatSlot = (slot) => {
+            const d = new Date(`1970-01-01T${slot}`);
+            return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        };
+
+        const normalizeDateInput = (value) => {
+            if (!value) return '';
+            if (typeof value === 'string') return value;
+            if (value instanceof Date) return value.toISOString().split('T')[0];
+            return '';
+        };
+
+        const isTimeWithinRestriction = (dateStr, time) => {
+            const normalizedDate = normalizeDateInput(dateStr);
+            if (!normalizedDate) return false;
+
+            return restrictedDates.some((restriction) => (
+                restriction.date === normalizedDate &&
+                time >= restriction.start_time &&
+                time <= restriction.end_time
+            ));
+        };
+
+        const isFullyRestricted = (dateValue) => {
+            const normalizedDate = normalizeDateInput(dateValue);
+            if (!normalizedDate) return false;
+
+            return restrictedDates.some((restriction) => (
+                restriction.date === normalizedDate &&
+                restriction.start_time === '00:00:00' &&
+                restriction.end_time === '23:59:59'
+            ));
+        };
+
+        const updateTimeSlotsFor = (selectId, dateValue) => {
+            const select = document.getElementById(selectId);
+            if (!select) return;
+
+            // Preserve current selection if it's still valid, otherwise reset
+            const currentValue = select.value;
+            select.innerHTML = '<option value="">Select a time</option>';
+
+            if (!dateValue) return;
+
+            const dateObj = new Date(dateValue);
+            if (Number.isNaN(dateObj.getTime())) return;
+
+            if (dateObj.getDay() === 0 || isFullyRestricted(dateValue)) return; // Sunday or fully restricted
+
+            let newSelection = null;
+            timeSlots.forEach((slot) => {
+                if (!isTimeWithinRestriction(dateValue, slot)) {
+                    const opt = document.createElement('option');
+                    opt.value = slot;
+                    opt.textContent = formatSlot(slot);
+                    select.appendChild(opt);
+                    if (slot === currentValue) {
+                         newSelection = currentValue;
+                    }
+                }
+            });
+            if (newSelection) {
+                select.value = newSelection;
+            }
+        };
+
+        // --- Modal/View Logic ---
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initialize Flatpickr for the follow-up modal
+            const followUpDialog = document.getElementById('scheduleFollowUpDialog');
+
+            followUpDatePicker = flatpickr('#follow_up_appointment_date', {
+                dateFormat: 'Y-m-d',
+                minDate: 'today',
+                appendTo: document.getElementById('follow_up_calendar_wrapper'),
+                static: true,
+                disable: [
+                    (date) => date.getDay() === 0 || isFullyRestricted(date) // Disable Sundays and fully restricted dates
+                ],
+                onReady() {
+                    this.calendarContainer.classList.add('flatpickr-calendar--dialog');
+                },
+                onOpen() {
+                    // Update time slots on opening, if a date is already selected
+                    updateTimeSlotsFor('follow_up_appointment_time', this.input.value);
+                },
+                onChange(selectedDates, dateStr) {
+                    updateTimeSlotsFor('follow_up_appointment_time', dateStr);
+                }
+            });
+
+            // Reset modal on close
+            followUpDialog.addEventListener('close', () => {
+                document.getElementById('scheduleFollowUpForm').reset();
+                followUpDatePicker.clear();
+                document.getElementById('follow_up_pet_id').innerHTML = '<option value="">Select a pet</option>';
+                document.getElementById('follow_up_appointment_time').innerHTML = '<option value="">Select a time</option>';
+            });
+        });
+
+
+        function openScheduleFollowUpDialog(userId, userName, petIdsStr, petNamesStr) {
+            const dialog = document.getElementById('scheduleFollowUpDialog');
+            document.getElementById('scheduleFollowUpTitle').innerText = `Schedule Follow-Up for ${userName}`;
+            document.getElementById('follow_up_user_id').value = userId;
+
+            const petSelect = document.getElementById('follow_up_pet_id');
+            petSelect.innerHTML = '<option value="">Select a pet</option>';
+
+            if (petIdsStr) {
+                const petIds = petIdsStr.split(separator);
+                const petNames = petNamesStr.split(separator);
+
+                petIds.forEach((id, index) => {
+                    const option = document.createElement('option');
+                    option.value = id;
+                    option.textContent = petNames[index];
+                    petSelect.appendChild(option);
+                });
+            }
+            
+            // Set default service to first option if available, or just leave 'Select a service'
+            document.getElementById('follow_up_service_id').value = document.getElementById('follow_up_service_id').options[1] ? document.getElementById('follow_up_service_id').options[1].value : '';
+
+            // Open date picker to select a date
+            followUpDatePicker.setDate(new Date()); // Optional: set to today's date
+            updateTimeSlotsFor('follow_up_appointment_time', normalizeDateInput(new Date()));
+            
+            dialog.showModal();
+            followUpDatePicker.open();
+        }
 
         //when the row is selected this will show 
-
         table.querySelectorAll('tbody tr').forEach(row => {
             if (row.dataset.userName) {
                 row.addEventListener('click', () => {
@@ -231,15 +461,7 @@ $conn->close();
                         userAddress,
                         petIds: petIdsStr,
                         petNames: petNamesStr,
-                        petTypes: petTypesStr,
-                        petAges: petAgesStr,
-                        petBreeds: petBreedsStr,
-                        petFavoriteActivities: petFavoriteActivitiesStr,
-                        petMedicalHistories: petMedicalHistoriesStr,
-                        petCreatedAts: petCreatedAtsStr,
-                        petImages: petImagesStr,
-                        petBodyTemps: petBodyTempsStr,
-                        petWeights: petWeightsStr,
+                        // ... other pet details
                         appointmentDates: appointmentDatesStr,
                         appointmentServices: appointmentServicesStr,
                         appointmentPetNames: appointmentPetNamesStr,
@@ -274,8 +496,8 @@ $conn->close();
                                 </table>
                             </div>
                             <div class="flex justify-end gap-2 mt-2">
-                                <button type="button" class="btn-sm-outline py-0 text-xs" onclick="openDeleteDialog('${userId}')">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-calendar-clock-icon lucide-calendar-clock"><path d="M16 14v2.2l1.6 1"/><path d="M16 2v4"/><path d="M21 7.5V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h3.5"/><path d="M3 10h5"/><path d="M8 2v4"/><circle cx="16" cy="16" r="6"/></svg>
+                                <button type="button" class="btn-sm-outline py-0 text-xs" onclick="openScheduleFollowUpDialog('${userId}', '${userName.replace(/'/g, "\\'")}', '${petIdsStr}', '${petNamesStr}')">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-calendar-clock-icon lucide-calendar-clock"><path d="M16 14v2.2l1.6 1"/><path d="M16 2v4"/><path d="M21 7.5V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h3.5"/><path d="M3 10h5"/><path d="M8 2v4"/><circle cx="16" cy="16" r="6"/></svg>
                                     Schedule Follow-Up
                                 </button>
                                 <button type="button" class="btn-sm-destructive py-0 text-xs" onclick="openDeleteDialog('${userId}')">
@@ -289,20 +511,22 @@ $conn->close();
                             </div>
                         </div>
                     `;
+                    // ... (rest of petsHtml and appointmentsHtml generation)
 
                     let petsHtml = '<h2 class="text-md font-semibold mt-6 mb-4">Pets</h2>';
                     if (petNamesStr) {
                         const petIds = petIdsStr.split(separator);
                         const petNames = petNamesStr.split(separator);
-                        const petTypes = petTypesStr.split(separator);
-                        const petAges = petAgesStr.split(separator);
-                        const petBreeds = petBreedsStr.split(separator);
-                        const petFavoriteActivities = petFavoriteActivitiesStr.split(separator);
-                        const petMedicalHistories = petMedicalHistoriesStr.split(separator);
-                        const petCreatedAts = petCreatedAtsStr.split(separator);
-                        const petImages = petImagesStr.split(separator);
-                        const petBodyTemps = petBodyTempsStr.split(separator);
-                        const petWeights = petWeightsStr.split(separator);
+                        const petTypes = row.dataset.petTypes.split(separator);
+                        const petAges = row.dataset.petAges.split(separator);
+                        const petBreeds = row.dataset.petBreeds.split(separator);
+                        const petFavoriteActivities = row.dataset.petFavoriteActivities.split(separator);
+                        const petMedicalHistories = row.dataset.petMedicalHistories.split(separator);
+                        const petCreatedAts = row.dataset.petCreatedAts.split(separator);
+                        const petImages = row.dataset.petImages.split(separator);
+                        const petBodyTemps = row.dataset.petBodyTemps.split(separator);
+                        const petWeights = row.dataset.petWeights.split(separator);
+
 
                         petsHtml += `
                             <div class="overflow-x-auto">
@@ -325,7 +549,7 @@ $conn->close();
                                     <tbody>
                         `;
                         petNames.forEach((name, index) => {
-                            const image = petImages[index] ? `../../Uploads/${petImages[index]}` : 'https://via.placeholder.com/100';
+                            const image = petImages[index] && petImages[index] !== 'NULL' ? `../../Uploads/${petImages[index]}` : 'https://via.placeholder.com/100';
                             const createdAt = new Date(petCreatedAts[index]).toLocaleDateString('en-US', {
                                 year: 'numeric',
                                 month: 'long',
@@ -393,6 +617,7 @@ $conn->close();
                     } else {
                         appointmentsHtml += '<p>No appointment history found for this customer.</p>';
                     }
+
 
                     detailsContent.innerHTML = `
                         ${userDetailsHtml}

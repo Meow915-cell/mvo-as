@@ -30,7 +30,6 @@ aside nav summary {
                         </a>
                     </li>
 
-                    
                     <li>
                         <a href="../my-appointments" class="hover:!bg-sky-200/50 !rounded-full border-transparent">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"

@@ -15,9 +15,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt->bind_param("si", $permissions, $user_id);
     
     if ($stmt->execute()) {
-        header("Location: ../users.php?success=Permissions updated successfully");
+        header("Location: ../users/?success=Permissions updated successfully");
     } else {
-        header("Location: ../users.php?error=Failed to update permissions");
+        header("Location: ../users/?error=Failed to update permissions");
     }
     $stmt->close();
 }
