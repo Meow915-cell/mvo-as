@@ -16,17 +16,18 @@ if (isset($_GET['status'])) {
 $module = 'appointments';
 $access = restrictAccess($conn, $_SESSION['user_id'], $module);
 
-// Update past confirmed appointments to completed
+// Update past confirmed appointments to completed (status update only, no illness/treatment here)
 $current_datetime = date('Y-m-d H:i:s');
 $stmt = $conn->prepare("UPDATE appointments SET status = 'completed' 
                         WHERE status = 'confirmed' 
-                        AND CONCAT(appointment_date, ' ', appointment_time) < ?");
+                        AND CONCAT(appointment_date, ' ', appointment_time) < ? 
+                        AND (illness IS NULL OR illness = '')"); // Only auto-complete if illness/treatment not yet set
 $stmt->bind_param("s", $current_datetime);
 $stmt->execute();
 $stmt->close();
 
-// Fetch appointments with pet image
-$sql = "SELECT a.id, a.appointment_date, a.appointment_time, a.reason, a.status, 
+// Fetch appointments with pet image, **including illness and treatment**
+$sql = "SELECT a.id, a.appointment_date, a.appointment_time, a.reason, a.status, a.illness, a.treatment, 
         u.name AS user_name, p.name AS pet_name, p.image AS pet_image, s.name AS service_name 
         FROM appointments a 
         JOIN users u ON a.user_id = u.id 
@@ -69,7 +70,9 @@ while ($row = $result->fetch_assoc()) {
             'pet_image' => $row['pet_image'],
             'service_name' => $row['service_name'],
             'reason' => $row['reason'],
-            'status' => $row['status']
+            'status' => $row['status'],
+            'illness' => $row['illness'], // <-- ADDED
+            'treatment' => $row['treatment'] // <-- ADDED
         ]
     ];
 }
@@ -118,16 +121,18 @@ $conn->close();
     }
 
     /* Change the header text color in list views */
-.fc-theme-standard .fc-list-day-cushion {
-  color: #1e3a8a !important; /* your preferred color */
-  font-weight: 600; /* optional: make it bolder */
-}
+    .fc-theme-standard .fc-list-day-cushion {
+        color: #1e3a8a !important;
+        /* your preferred color */
+        font-weight: 600;
+        /* optional: make it bolder */
+    }
 
-/* Optionally, change the date background too */
-.fc-theme-standard .fc-list-day-cushion {
-  background-color: #f0f4ff; /* light blue background */
-}
-
+    /* Optionally, change the date background too */
+    .fc-theme-standard .fc-list-day-cushion {
+        background-color: #f0f4ff;
+        /* light blue background */
+    }
     </style>
 </head>
 
@@ -202,6 +207,50 @@ $conn->close();
 
         </div>
     </main>
+
+    <!-- Completion Modal Structure (Updated to dialog structure) -->
+    <dialog id="completeModal" class="dialog w-full sm:max-w-[425px]"
+        onclick="if (event.target === this) this.close()">
+        <article class="w-md max-h-[85vh] ">
+            <header>
+                <h2>Complete Appointment</h2>
+                <p>Enter the illness/diagnosis and treatment notes below. Click submit when done.</p>
+            </header>
+
+            <section class="overflow-y-auto">
+                <form class="form grid gap-4" id="completeForm" onsubmit="event.preventDefault(); handleCompleteSubmit();">
+                    <input type="hidden" id="completeAppointmentId">
+
+                    <div class="grid gap-3">
+                        <label for="illness">Illness/Diagnosis:</label>
+                        <textarea id="illness" name="illness" rows="3" class="input w-full" required></textarea>
+                    </div>
+
+                    <div class="grid gap-3">
+                        <label for="treatment">Treatment/Notes:</label>
+                        <textarea id="treatment" name="treatment" rows="5" class="input w-full" required></textarea>
+                    </div>
+
+                    <footer class="flex justify-end gap-2 mt-4">
+                        <button type="button" class="btn-outline"
+                            onclick="this.closest('dialog').close()">Cancel</button>
+                        <button type="submit" class="btn bg-sky-500">Submit Completion</button>
+                    </footer>
+                </form>
+            </section>
+
+            <button type="button" aria-label="Close dialog" onclick="this.closest('dialog').close()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    class="lucide lucide-x-icon lucide-x">
+                    <path d="M18 6 6 18" />
+                    <path d="m6 6 12 12" />
+                </svg>
+            </button>
+        </article>
+    </dialog>
+
+
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
     <script>
     let calendar = null;
@@ -235,14 +284,30 @@ $conn->close();
                 const event = info.event;
                 const props = event.extendedProps;
 
+                let completionDetails = '';
+                if (props.status === 'completed') {
+                    completionDetails = `
+                        <div style="margin-top:20px; border-top:1px solid #ddd; padding-top:10px;">
+                            <strong>Illness/Diagnosis:</strong><br>
+                            <p style="margin-top:5px; overflow:auto; max-height:100px; white-space: pre-wrap; font-size: small;">${props.illness || 'N/A'}</p>
+                        </div>
+                        <div style="margin-top:10px;">
+                            <strong>Treatment/Notes:</strong><br>
+                            <p style="margin-top:5px; overflow:auto; max-height:100px; white-space: pre-wrap; font-size: small;">${props.treatment || 'N/A'}</p>
+                        </div>
+                    `;
+                }
+
+
                 let actions = '';
                 if (props.status === 'pending') {
                     actions +=
-                        `<button onclick="updateStatus(${props.appointment_id}, 'approve')" ${hasWriteAccess ? '' : 'disabled'}>Accept</button>
-                                    <button class="danger" onclick="updateStatus(${props.appointment_id}, 'cancel')" ${hasWriteAccess ? '' : 'disabled'}>Reject</button>`;
+                        `<button class="btn btn-sm bg-success text-white hover:bg-success-700" onclick="updateStatus(${props.appointment_id}, 'approve')" ${hasWriteAccess ? '' : 'disabled'}>Accept</button>
+                        <button class="btn btn-sm bg-danger text-white hover:bg-danger-700" onclick="updateStatus(${props.appointment_id}, 'cancel')" ${hasWriteAccess ? '' : 'disabled'}>Reject</button>`;
                 } else if (props.status === 'confirmed') {
                     actions +=
-                        `<button class="danger" onclick="updateStatus(${props.appointment_id}, 'cancel')" ${hasWriteAccess ? '' : 'disabled'}>Reject</button>`;
+                        `<button class="btn btn-sm bg-sky-500 text-white hover:bg-sky-700" onclick="showCompleteModal(${props.appointment_id})" ${hasWriteAccess ? '' : 'disabled'}>Complete Appointment</button>
+                        <button class="btn btn-sm bg-danger text-white hover:bg-danger-700" onclick="updateStatus(${props.appointment_id}, 'cancel')" ${hasWriteAccess ? '' : 'disabled'}>Cancel</button>`;
                 }
 
                 const detailsHTML = `
@@ -276,8 +341,9 @@ $conn->close();
                                     </div>
                                     <div style="border-top:1px solid #ddd; padding-top:10px;">
                                         <strong>Reason:</strong><br>
-                                        <p style="margin-top:5px; overflow:auto; max-height:400px;">${props.reason}</p>
+                                        <p style="margin-top:5px; overflow:auto; max-height:100px; font-size: small;">${props.reason}</p>
                                     </div>
+                                    ${completionDetails}
                                 </div>
                                 <div style="margin-top:auto; padding-top:10px; border-top:1px solid #ddd; text-align:center; display:flex; gap:1rem; justify-content:center;">
                                     ${actions}
@@ -323,6 +389,54 @@ updateTodayButtonState();
             });
     }
 
+
+    function showCompleteModal(appointment_id) {
+        if (<?php echo json_encode($access['has_write_access']); ?> === false) {
+            alert('You do not have permission to complete appointments.');
+            return;
+        }
+        document.getElementById('completeAppointmentId').value = appointment_id;
+        // Clear previous input
+        document.getElementById('illness').value = '';
+        document.getElementById('treatment').value = '';
+        // Use native dialog method
+        document.getElementById('completeModal').showModal(); 
+    }
+
+    function handleCompleteSubmit() {
+        const appointment_id = document.getElementById('completeAppointmentId').value;
+        const illness = document.getElementById('illness').value;
+        const treatment = document.getElementById('treatment').value;
+
+        if (!illness.trim() || !treatment.trim()) {
+            alert('Illness/Diagnosis and Treatment/Notes are required.');
+            return;
+        }
+
+        fetch('../actions/manage_appointment.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: `appointment_id=${appointment_id}&action=complete&illness=${encodeURIComponent(illness)}&treatment=${encodeURIComponent(treatment)}`
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.message);
+                    // Use native dialog method to close
+                    document.getElementById('completeModal').close(); 
+                    location.reload();
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                alert('Request error: ' + err.message);
+            });
+    }
+
     function showDetailsView(content) {
         const calendarContainer = document.getElementById('calendarContainer');
         const detailsContainer = document.getElementById('appointmentDetails');
@@ -347,9 +461,6 @@ updateTodayButtonState();
         btn.classList.remove('btn-sm-outline');
         btn.classList.add('btn-sm', 'bg-sky-500');
     }
-
-
-
 
     function showCalendarView() {
         const calendarContainer = document.getElementById('calendarContainer');

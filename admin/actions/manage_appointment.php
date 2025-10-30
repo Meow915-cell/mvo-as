@@ -66,6 +66,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $formattedTime = date('h:i A', strtotime($new_time));
         $subject = "Appointment Rescheduled";
         $message = "Hi $name,\n\nYour appointment for $service has been rescheduled to $new_date at $formattedTime.\n\nThank you!";
+    } elseif ($action === 'complete') {
+        if (!isset($_POST['illness'], $_POST['treatment'])) {
+            echo json_encode(['success' => false, 'error' => 'Missing illness or treatment details']);
+            exit();
+        }
+
+        $illness = $_POST['illness'];
+        $treatment = $_POST['treatment'];
+
+        // Update status to 'completed' and record illness/treatment
+        $stmt = $conn->prepare("UPDATE appointments SET status = 'completed', illness = ?, treatment = ? WHERE id = ?");
+        $stmt->bind_param("ssi", $illness, $treatment, $appointment_id);
+        if (!$stmt->execute()) {
+             echo json_encode(['success' => false, 'error' => 'Database update failed: ' . $conn->error]);
+             exit();
+        }
+        $stmt->close();
+
+        $subject = "Appointment Completed";
+        $message = "Hi $name,\n\nYour appointment for $service on $date at $formattedTime has been marked as completed.\n\nIllness/Diagnosis: $illness\nTreatment/Notes: $treatment\n\nThank you!";
     } else {
         echo json_encode(['success' => false, 'error' => 'Invalid action']);
         exit();
